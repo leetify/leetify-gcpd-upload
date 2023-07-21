@@ -7,8 +7,21 @@ chrome.runtime.onStartup.addListener(() => LeetifyAccessToken.tryToFetchLeetifyA
 chrome.runtime.onInstalled.addListener(() => LeetifyAccessToken.tryToFetchLeetifyAccessToken());
 
 chrome.action.onClicked.addListener(async (tab) => {
+	const leetifyAccessToken = await LeetifyAccessToken.getToken();
+	if (!leetifyAccessToken) return;
+
 	const matches = await Gcpd.fetchAllMatches('matchhistorywingman');
-	console.log('matches', matches);
+	if (!matches.length) return;
+
+	await fetch('https://api.leetify.test/api/upload-from-url', { // TODO
+		method: 'POST',
+		body: JSON.stringify({ matches }),
+
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${leetifyAccessToken}`,
+		},
+	});
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
