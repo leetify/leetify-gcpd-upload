@@ -18,7 +18,7 @@ class LeetifyAccessToken {
 		});
 
 		if (tab?.id) this.fetchLeetifyAccessTokenTabId = tab.id;
-	};
+	}
 
 	public async handleEvent(messageBody: Record<string, any>): Promise<void> {
 		if (!isLeetifyAccessTokenBody(messageBody)) return;

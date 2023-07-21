@@ -1,0 +1,89 @@
+{
+	"extends": ["airbnb-base", "plugin:@typescript-eslint/recommended"],
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["@typescript-eslint"],
+
+	"env": {
+		"es6": true,
+		"node": true
+	},
+
+	"globals": {
+		"Atomics": "readonly",
+		"SharedArrayBuffer": "readonly"
+	},
+
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module"
+	},
+
+	"settings": {
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		}
+	},
+
+	"rules": {
+		"@typescript-eslint/ban-ts-ignore": "off",
+		"@typescript-eslint/camelcase": "off",
+		"@typescript-eslint/explicit-function-return-type": "off",
+		"@typescript-eslint/no-empty-function": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-unused-vars": "off",
+		"arrow-parens": ["error", "always"],
+		"class-methods-use-this": "off",
+		"consistent-return": "off",
+		"curly": "off",
+		"default-case": "off",
+		"dot-notation": "off",
+		"func-names": "off",
+		"guard-for-in": "off",
+		"import/extensions": "off",
+		"import/newline-after-import": "off",
+		"import/no-unresolved": "off",
+		"import/prefer-default-export": "off",
+		"indent": ["error", "tab", {"SwitchCase": 1}],
+		"linebreak-style": "off",
+		"lines-between-class-members": "off",
+		"max-len": "off",
+		"newline-per-chained-call": "off",
+		"no-await-in-loop": "off",
+		"no-case-declarations": "off",
+		"no-console": "off",
+		"no-continue": "off",
+		"no-dupe-class-members": "off",
+		"no-mixed-operators": ["error", { "groups": [ ["&", "|", "^", "~", "<<", ">>", ">>>"], ["&&", "||"] ] }],
+		"no-multi-assign": "off",
+		"no-new": "off",
+		"no-param-reassign": "off",
+		"no-plusplus": "off",
+		"no-prototype-builtins": "off",
+		"no-restricted-syntax": "off",
+		"no-return-assign": "off",
+		"no-tabs": "off",
+		"no-underscore-dangle": "off",
+		"no-unreachable": "off",
+		"no-unused-vars": "off",
+		"no-useless-constructor": "off",
+		"object-curly-newline": "off",
+		"padded-blocks": "off",
+		"prefer-arrow-callback": "off",
+		"prefer-destructuring": "off",
+		"prefer-promise-reject-errors": "off",
+		"prefer-rest-params": "off",
+		"quotes": ["error", "single", { "allowTemplateLiterals": true, "avoidEscape": true }],
+		"radix": "off",
+		"semi": 1,
+		"yoda": "off",
+
+		"import/no-extraneous-dependencies": [
+			"error",
+			{
+				"devDependencies": true
+			}
+		]
+	}
+}

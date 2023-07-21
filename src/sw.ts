@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener(() => LeetifyAccessToken.tryToFetchLeetif
 
 chrome.action.onClicked.addListener(async (tab) => {
 	const matches = await Gcpd.fetchAllMatches('matchhistorywingman');
-	console.log('matches', matches)
+	console.log('matches', matches);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {

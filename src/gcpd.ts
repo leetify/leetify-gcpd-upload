@@ -38,7 +38,7 @@ class Gcpd {
 		}
 	}
 
-	private async fetchMatchesRecursively(matches: GcpdMatch[], tab: GcpdTab, depth = 1, continueToken?: string): Promise<GcpdMatch[]> {
+	private async fetchMatchesRecursively(matches: GcpdMatch[], tab: GcpdTab, depth = 1, continueToken: string | undefined = undefined): Promise<GcpdMatch[]> {
 		const url = new URL('https://steamcommunity.com/my/gcpd/730');
 		url.searchParams.set('ajax', '1');
 		url.searchParams.set('tab', tab);
@@ -56,8 +56,7 @@ class Gcpd {
 
 		matches.push(...parsed.matches);
 
-		const shouldEndRecursion =
-			depth >= 16 // prevent this from going on too long
+		const shouldEndRecursion = depth >= 16 // prevent this from going on too long
 			|| !json.continue_token // Steam won't let us request any more
 			|| parsed.cells > parsed.matches.length // either found no matches, or there were cells we couldn't parse
 			|| (json.continue_text.match(/^\d{4}-\d{2}-\d{2}$/) && +new Date(json.continue_text) < +new Date() - 30 * 24 * 60 * 60 * 1000); // we've looked back far enough, Valve doesn't keep demos for more than 30 days

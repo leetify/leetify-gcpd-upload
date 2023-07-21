@@ -4,11 +4,16 @@
 	"version": "0.0.1",
 	"description": "Auto-upload Counter-Strike demos from unranked Matchmaking to Leetify",
 	"scripts": {
-		"watch": "npx esbuild src/sw.ts src/content-scripts/leetify.ts src/content-scripts/dom-parser.ts --bundle --outdir=dist --watch"
+		"watch": "npx esbuild src/sw.ts src/content-scripts/leetify.ts src/content-scripts/dom-parser.ts --bundle --outdir=dist --watch",
+		"lint": "eslint src types --ext .ts",
+		"fix": "npm run lint -- --fix"
 	},
 	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^6.1.0",
 		"chrome-types": "^0.1.217",
 		"esbuild": "^0.18.14",
+		"eslint": "^8.45.0",
+		"eslint-config-airbnb-base": "^15.0.0",
 		"typescript": "^5.1.6"
 	}
 }

@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow */
+
 export enum EventName {
 	DOM_PARSER_READY = 'dom_parser_ready',
 	LEETIFY_ACCESS_TOKEN = 'leetify_access_token',
