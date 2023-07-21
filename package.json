@@ -1,0 +1,14 @@
+{
+	"private": true,
+	"name": "leetify-gcpd-upload",
+	"version": "0.0.1",
+	"description": "Auto-upload Counter-Strike demos from unranked Matchmaking to Leetify",
+	"scripts": {
+		"watch": "npx esbuild src/sw.ts src/content-scripts/leetify.ts src/content-scripts/dom-parser.ts --bundle --outdir=dist --watch"
+	},
+	"devDependencies": {
+		"chrome-types": "^0.1.217",
+		"esbuild": "^0.18.14",
+		"typescript": "^5.1.6"
+	}
+}

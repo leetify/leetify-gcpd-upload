@@ -1,0 +1,52 @@
+{
+	"manifest_version": 3,
+	"name": "Leetify Unranked Uploader",
+	"description": "Auto-upload Counter-Strike demos from unranked Matchmaking to Leetify",
+	"version": "0.0.1",
+
+	"icons": {
+		"16": "assets/icons/16.png",
+		"32": "assets/icons/32.png",
+		"48": "assets/icons/48.png",
+		"64": "assets/icons/64.png",
+		"128": "assets/icons/128.png",
+		"256": "assets/icons/256.png"
+	},
+
+	"action": {
+		"default_icon": {
+			"16": "assets/icons/16.png",
+			"32": "assets/icons/32.png",
+			"48": "assets/icons/48.png",
+			"64": "assets/icons/64.png",
+			"128": "assets/icons/128.png",
+			"256": "assets/icons/256.png"
+		}
+	},
+
+	"background": {
+		"service_worker": "dist/sw.js"
+	},
+
+	"content_scripts": [
+		{
+			"matches": [
+				"https://leetify.com/*"
+			],
+
+			"js": [
+				"dist/content-scripts/leetify.js"
+			]
+		}
+	],
+
+	"permissions": [
+		"offscreen",
+		"storage",
+		"webRequest"
+	],
+
+	"host_permissions": [
+		"https://steamcommunity.com/my/gcpd/730"
+	]
+}
