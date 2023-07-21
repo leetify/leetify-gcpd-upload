@@ -13,7 +13,7 @@ class LeetifyAccessToken {
 
 	public async tryToFetchLeetifyAccessToken(): Promise<void> {
 		const tab = await chrome.tabs.create({
-			url: 'https://leetify.com/?redirect=no',
+			url: 'https://leetify.test/?redirect=no', // TODO
 			active: false,
 		});
 
@@ -28,8 +28,6 @@ class LeetifyAccessToken {
 			await chrome.tabs.remove(this.fetchLeetifyAccessTokenTabId);
 			this.fetchLeetifyAccessTokenTabId = undefined;
 		}
-
-		console.log('received leetify access token', messageBody.accessToken);
 
 		await chrome.storage.session.set({
 			[SessionStorageKey.LEETIFY_ACCESS_TOKEN]: messageBody.accessToken,

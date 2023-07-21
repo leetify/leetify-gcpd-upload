@@ -4,7 +4,8 @@
 	"version": "0.0.1",
 	"description": "Auto-upload Counter-Strike demos from unranked Matchmaking to Leetify",
 	"scripts": {
-		"watch": "npx esbuild src/sw.ts src/content-scripts/leetify.ts src/content-scripts/dom-parser.ts --bundle --outdir=dist --watch",
+		"build": "npx esbuild src/sw.ts src/content-scripts/leetify.ts src/content-scripts/dom-parser.ts --bundle --outdir=dist",
+		"watch": "npm run build -- --watch",
 		"lint": "eslint src types --ext .ts",
 		"fix": "npm run lint -- --fix"
 	},
