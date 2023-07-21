@@ -20,7 +20,7 @@ const parseSteamGcpdResponse = (message: Record<string, any>, sendResponse: (r: 
 	const matches: GcpdMatch[] = [];
 
 	for (const cell of cells as unknown as Element[]) {
-		const urlElement = cell.querySelector('table.csgo_scoreboard_inner_left tbody tr:nth-child(5) td a') as HTMLAnchorElement | null;
+		const urlElement = cell.querySelector('table.csgo_scoreboard_inner_left tbody tr td a') as HTMLAnchorElement | null;
 		if (!urlElement) break; // when a match does not have a download url, all later matches will most likely not have one either
 
 		const url = urlElement.getAttribute('href');
