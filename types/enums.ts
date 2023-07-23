@@ -1,5 +1,9 @@
 /* eslint-disable no-shadow */
 
+export enum AlarmName {
+	BACKGROUND_SYNC = 'background_sync',
+}
+
 export enum EventName {
 	DOM_PARSER_READY = 'dom_parser_ready',
 	LEETIFY_ACCESS_TOKEN = 'leetify_access_token',

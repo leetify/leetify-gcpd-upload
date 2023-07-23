@@ -1,39 +1,19 @@
-import { EventName, GcpdTab } from '../types/enums';
+import { AlarmName, EventName } from '../types/enums';
 import { isRuntimeMessage } from '../types/interfaces';
 import { LeetifyAccessToken } from './leetify-access-token';
-import { Gcpd } from './gcpd';
-import { syncStorageKey } from './helpers/sync-storage-key';
+import { BackgroundSync } from './background-sync';
+import { syncAllMatches } from './helpers/sync-matches';
 
-chrome.runtime.onStartup.addListener(() => LeetifyAccessToken.tryToFetchLeetifyAccessToken());
-chrome.runtime.onInstalled.addListener(() => LeetifyAccessToken.tryToFetchLeetifyAccessToken());
+const onStartupOrInstalled = async (): Promise<void> => {
+	await LeetifyAccessToken.tryToFetchLeetifyAccessToken();
+	await BackgroundSync.setAlarm();
+};
 
-const syncMatches = async (tab: GcpdTab): Promise<void> => {
-	const leetifyAccessToken = await LeetifyAccessToken.getToken();
-	if (!leetifyAccessToken) return;
-
-	const matches = await Gcpd.fetchAllMatches(tab);
-	if (!matches.length) return;
-
-	const response = await fetch('https://api.leetify.test/api/upload-from-url', { // TODO
-		method: 'POST',
-		body: JSON.stringify({ matches }),
-
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${leetifyAccessToken}`,
-		},
-	});
-
-	if (response.status !== 204) return;
-
-	await chrome.storage.sync.set({
-		[syncStorageKey(tab)]: matches[0].timestamp,
-	});
-}
+chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
+chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
 
 chrome.action.onClicked.addListener(async (tab) => {
-	await syncMatches(GcpdTab.SCRIMMAGE);
-	await syncMatches(GcpdTab.WINGMAN);
+	await syncAllMatches();
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
@@ -42,5 +22,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
 
 	switch (message.event) {
 		case EventName.LEETIFY_ACCESS_TOKEN: return LeetifyAccessToken.handleEvent(message.data);
+	}
+});
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+	switch (alarm.name) {
+		case AlarmName.BACKGROUND_SYNC: return BackgroundSync.handleAlarm();
 	}
 });
