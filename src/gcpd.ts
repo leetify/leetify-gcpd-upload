@@ -1,7 +1,6 @@
 import { GcpdMatch, ParseSteamGcpdResponseResponse } from '../types/interfaces';
-import { EventName } from '../types/enums';
-
-type GcpdTab = 'matchhistoryscrimmage' | 'matchhistorywingman';
+import { EventName, GcpdTab } from '../types/enums';
+import { syncStorageKey } from './helpers/sync-storage-key';
 
 interface SteamGcpdResponse {
 	continue_text: string;
@@ -30,15 +29,32 @@ class Gcpd {
 			url: 'src/dom-parser.html',
 		});
 
+		const previouslyFoundMatchTimestampKey = syncStorageKey(tab);
+		const { [previouslyFoundMatchTimestampKey]: previouslyFoundMatchTimestamp } = await chrome.storage.sync.get(previouslyFoundMatchTimestampKey);
+
 		try {
-			const matches = await this.fetchMatchesRecursively([], tab);
+			const matches = await this.fetchMatchesRecursively({ tab, previouslyFoundMatchTimestamp, matches: [] });
 			return matches;
 		} finally {
 			await chrome.offscreen.closeDocument();
 		}
 	}
 
-	private async fetchMatchesRecursively(matches: GcpdMatch[], tab: GcpdTab, depth = 1, continueToken: string | undefined = undefined): Promise<GcpdMatch[]> {
+	private async fetchMatchesRecursively({
+		continueToken,
+		depth,
+		matches,
+		previouslyFoundMatchTimestamp,
+		tab,
+	}: {
+		continueToken?: string;
+		depth?: number;
+		matches: GcpdMatch[];
+		previouslyFoundMatchTimestamp: string | undefined;
+		tab: GcpdTab;
+	}): Promise<GcpdMatch[]> {
+		depth = depth === undefined ? 1 : depth;
+
 		const url = new URL('https://steamcommunity.com/my/gcpd/730');
 		url.searchParams.set('ajax', '1');
 		url.searchParams.set('tab', tab);
@@ -51,7 +67,7 @@ class Gcpd {
 
 		const parsed: ParseSteamGcpdResponseResponse = await chrome.runtime.sendMessage({
 			event: EventName.PARSE_STEAM_GCPD_RESPONSE,
-			data: { html: json.html },
+			data: { html: json.html, previouslyFoundMatchTimestamp },
 		});
 
 		matches.push(...parsed.matches);
@@ -63,7 +79,13 @@ class Gcpd {
 
 		if (shouldEndRecursion) return matches;
 
-		return this.fetchMatchesRecursively(matches, tab, depth + 1, json.continue_token);
+		return this.fetchMatchesRecursively({
+			matches,
+			previouslyFoundMatchTimestamp,
+			tab,
+			continueToken: json.continue_token,
+			depth: depth + 1,
+		});
 	}
 }
 

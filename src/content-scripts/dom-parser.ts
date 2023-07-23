@@ -3,11 +3,16 @@ import { isRuntimeMessage, GcpdMatch, ParseSteamGcpdResponseResponse } from '../
 
 interface ParseSteamGcpdResponseMessage {
 	html: string;
+	previouslyFoundMatchTimestamp?: string;
 }
 
 const isParseSteamGcpdResponseMessage = (v: any): v is ParseSteamGcpdResponseMessage => typeof v === 'object'
 	&& v.hasOwnProperty('html')
-	&& typeof v.html === 'string';
+	&& typeof v.html === 'string'
+	&& (
+		!v.hasOwnProperty('previouslyFoundMatchTimestamp')
+		|| typeof v.previouslyFoundMatchTimestamp === 'string'
+	);
 
 const parseSteamGcpdResponse = (message: Record<string, any>, sendResponse: (r: ParseSteamGcpdResponseResponse) => void) => {
 	if (!isParseSteamGcpdResponseMessage(message)) return;
@@ -18,6 +23,7 @@ const parseSteamGcpdResponse = (message: Record<string, any>, sendResponse: (r: 
 	if (!cells.length) return sendResponse({ cells: 0, matches: [] });
 
 	const matches: GcpdMatch[] = [];
+	const timestampLimit = message.previouslyFoundMatchTimestamp ? new Date(message.previouslyFoundMatchTimestamp) : undefined;
 
 	for (const cell of cells as unknown as Element[]) {
 		const urlElement = cell.querySelector('table.csgo_scoreboard_inner_left tbody tr td a') as HTMLAnchorElement | null;
@@ -29,6 +35,9 @@ const parseSteamGcpdResponse = (message: Record<string, any>, sendResponse: (r: 
 		const timestampElement = cell.querySelector('table.csgo_scoreboard_inner_left tbody tr:nth-child(2) td') as HTMLTableCellElement | null;
 		const timestamp = timestampElement?.innerText?.trim();
 		if (!timestamp || !timestamp.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} GMT$/)) break; // something is weird if this happens
+
+		// if this match is older or as old as the latest match we've found previously, we don't need to upload it (or any following matches)
+		if (timestampLimit && new Date(timestamp) <= timestampLimit) break;
 
 		matches.push({ timestamp, url });
 	}
