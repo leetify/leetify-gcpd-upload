@@ -1,12 +1,15 @@
 import { SessionStorageKey } from '../types/enums';
 
 interface LeetifyAccessTokenBody {
-	accessToken: string;
+	accessToken: string | null;
 }
 
-const isLeetifyAccessTokenBody = (test: any): test is LeetifyAccessTokenBody => typeof test === 'object'
-	&& test.hasOwnProperty('accessToken')
-	&& typeof test['accessToken'] === 'string';
+const isLeetifyAccessTokenBody = (v: any): v is LeetifyAccessTokenBody => typeof v === 'object'
+	&& v.hasOwnProperty('accessToken')
+	&& (
+		typeof v.accessToken === 'string'
+		|| v.accessToken === null
+	);
 
 class LeetifyAccessToken {
 	protected fetchLeetifyAccessTokenTabId?: number;
@@ -22,16 +25,19 @@ class LeetifyAccessToken {
 
 	public async handleEvent(messageBody: Record<string, any>): Promise<void> {
 		if (!isLeetifyAccessTokenBody(messageBody)) return;
-		if (!messageBody?.accessToken) return;
 
 		if (this.fetchLeetifyAccessTokenTabId) {
 			await chrome.tabs.remove(this.fetchLeetifyAccessTokenTabId);
 			this.fetchLeetifyAccessTokenTabId = undefined;
 		}
 
-		await chrome.storage.session.set({
-			[SessionStorageKey.LEETIFY_ACCESS_TOKEN]: messageBody.accessToken,
-		});
+		if (messageBody.accessToken) {
+			await chrome.storage.session.set({
+				[SessionStorageKey.LEETIFY_ACCESS_TOKEN]: messageBody.accessToken,
+			});
+		} else {
+			await chrome.storage.session.remove(SessionStorageKey.LEETIFY_ACCESS_TOKEN);
+		}
 	}
 
 	public async getToken(): Promise<string | undefined> {

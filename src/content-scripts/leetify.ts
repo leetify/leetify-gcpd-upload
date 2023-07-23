@@ -1,8 +1,8 @@
+import { EventName } from '../../types/enums';
+
 const accessToken = localStorage.getItem('access_token');
 
-if (accessToken) {
-	chrome.runtime.sendMessage({
-		event: 'leetify_access_token',
-		data: { accessToken },
-	});
-}
+chrome.runtime.sendMessage({
+	event: EventName.LEETIFY_ACCESS_TOKEN,
+	data: { accessToken },
+});
