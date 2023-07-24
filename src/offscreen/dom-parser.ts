@@ -40,6 +40,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
 	if (!isRuntimeMessage(message)) return;
 
 	switch (message.event) {
-		case EventName.PARSE_STEAM_GCPD: return parseSteamGcpd(message.data, sendResponse);
+		case EventName.REQUEST_PARSE_STEAM_GCPD: return parseSteamGcpd(message.data, sendResponse);
 	}
 });

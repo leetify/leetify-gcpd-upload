@@ -1,6 +1,7 @@
 import { GcpdMatch, isParseSteamGcpdEventResponseBody } from '../types/interfaces';
 import { EventName, GcpdTab, SyncStatus } from '../types/enums';
 import { syncStorageKey } from './helpers/sync-storage-key';
+import { MatchSync } from './match-sync';
 
 interface SteamGcpdResponse {
 	continue_text: string;
@@ -43,7 +44,7 @@ class Gcpd {
 	}): Promise<GcpdMatch[]> {
 		depth = depth === undefined ? 1 : depth;
 
-		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { depth, status: SyncStatus.REQUESTING_GCPD_PAGE } });
+		await MatchSync.setStatus({ depth, status: SyncStatus.REQUESTING_GCPD_PAGE });
 
 		const url = new URL('https://steamcommunity.com/my/gcpd/730');
 		url.searchParams.set('ajax', '1');
@@ -56,7 +57,7 @@ class Gcpd {
 		if (!isSteamGcpdResponse(json)) return matches;
 
 		const parsed = await chrome.runtime.sendMessage({
-			event: EventName.PARSE_STEAM_GCPD,
+			event: EventName.REQUEST_PARSE_STEAM_GCPD,
 			data: { html: json.html, previouslyFoundMatchTimestamp },
 		});
 		if (!isParseSteamGcpdEventResponseBody(parsed)) return matches;

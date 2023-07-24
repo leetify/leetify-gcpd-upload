@@ -1,6 +1,6 @@
 import { defer } from './helpers/defer';
 import { EventName, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
-import { GcpdMatch, isLeetifyAccessTokenEventBody, isRuntimeMessage, RuntimeMessage } from '../types/interfaces';
+import { GcpdMatch, isLeetifyAccessTokenEventBody, isRuntimeMessage, SyncStatusEventBody } from '../types/interfaces';
 import { SyncForegroundTab } from './sync-foreground-tab';
 import { Gcpd } from './gcpd';
 import { syncStorageKey } from './helpers/sync-storage-key';
@@ -8,16 +8,11 @@ import { getOptionDefaults } from './constants';
 
 class MatchSync {
 	protected inProgress = false;
+	protected lastStatusEventBody: SyncStatusEventBody = { status: SyncStatus.WAITING_FOR_LEETIFY_AUTH };
 	protected leetifyAccessTokenPromise: ReturnType<typeof defer<string | null>> | null = null;
 
 	public constructor() {
 		this.setupListeners();
-	}
-
-	protected async sendMessageIfSyncForegroundPageExists(message: RuntimeMessage): Promise<void> {
-		if (!await SyncForegroundTab.exists()) return;
-
-		await chrome.runtime.sendMessage(message);
 	}
 
 	public async run(): Promise<void> {
@@ -25,7 +20,7 @@ class MatchSync {
 		this.inProgress = true;
 
 		try {
-			await this.sendMessageIfSyncForegroundPageExists({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.WAITING_FOR_LEETIFY_AUTH } });
+			await this.setStatus({ status: SyncStatus.WAITING_FOR_LEETIFY_AUTH });
 
 			this.leetifyAccessTokenPromise = defer<string | null>();
 
@@ -43,10 +38,10 @@ class MatchSync {
 			this.leetifyAccessTokenPromise = null;
 			await chrome.offscreen.closeDocument();
 
-			if (!leetifyAccessToken) return await this.sendMessageIfSyncForegroundPageExists({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.LEETIFY_AUTH_FAILED } });
+			if (!leetifyAccessToken) return await this.setStatus({ status: SyncStatus.LEETIFY_AUTH_FAILED });
 
-			await this.sendMessageIfSyncForegroundPageExists({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.LEETIFY_AUTH_SUCCESSFUL } });
-			await this.sendMessageIfSyncForegroundPageExists({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.GCPD_PARSER_INITIALIZING } });
+			await this.setStatus({ status: SyncStatus.LEETIFY_AUTH_SUCCESSFUL });
+			await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZING });
 
 			await chrome.offscreen.createDocument({
 				justification: 'Parse Steam GCPD page',
@@ -54,14 +49,27 @@ class MatchSync {
 				url: 'src/offscreen/dom-parser.html',
 			});
 
-			await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.GCPD_PARSER_INITIALIZED } });
+			await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZED });
 
 			await this.syncAllMatches(leetifyAccessToken);
 
-			await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.DONE } });
+			await this.setStatus({ status: SyncStatus.DONE });
 		} finally {
 			await chrome.offscreen.closeDocument().catch(() => {});
 			this.inProgress = false;
+		}
+	}
+
+	public async setStatus(eventBody: SyncStatusEventBody): Promise<void> {
+		this.lastStatusEventBody = eventBody;
+
+		if (!await SyncForegroundTab.exists()) return;
+
+		try {
+			await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: eventBody });
+		} catch (err) {
+			if (err && (err as any).message === 'Could not establish connection. Receiving end does not exist.') return;
+			throw err;
 		}
 	}
 
@@ -74,13 +82,13 @@ class MatchSync {
 		const shouldSync = await this.shouldSync(tab);
 		if (!shouldSync) return;
 
-		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { tab, status: SyncStatus.BEGINNING_SYNC } });
+		await this.setStatus({ tab, status: SyncStatus.BEGINNING_SYNC });
 
 		const matches = this.filterMatches(await Gcpd.fetchAllMatches(tab), shouldSync);
-		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.FINISHED_GCPD, found: matches.length } });
+		await this.setStatus({ status: SyncStatus.FINISHED_GCPD, found: matches.length });
 		if (!matches.length) return;
 
-		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.UPLOADING_TO_LEETIFY } });
+		await this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY });
 
 		const response = await fetch('https://api.leetify.test/api/upload-from-url', { // TODO
 			method: 'POST',
@@ -98,13 +106,13 @@ class MatchSync {
 			},
 		});
 
-		if (response.status !== 204) return chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED } });
+		if (response.status !== 204) return this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED });
 
 		await chrome.storage.sync.set({
 			[syncStorageKey(tab)]: matches[0].timestamp,
 		});
 
-		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { tab, status: SyncStatus.FINISHED_SYNC } });
+		await this.setStatus({ tab, status: SyncStatus.FINISHED_SYNC });
 	}
 
 	protected filterMatches(matches: GcpdMatch[], shouldSync: boolean | 'ranked_only' | 'unranked_only'): GcpdMatch[] {
@@ -150,6 +158,7 @@ class MatchSync {
 
 			switch (message.event) {
 				case EventName.LEETIFY_ACCESS_TOKEN: return this.handleLeetifyAccessToken(message.data);
+				case EventName.REQUEST_SYNC_STATUS: return this.handleRequestSyncStatus();
 			}
 		});
 	}
@@ -160,6 +169,10 @@ class MatchSync {
 		if (this.leetifyAccessTokenPromise) {
 			this.leetifyAccessTokenPromise.resolve(data.accessToken);
 		}
+	}
+
+	protected async handleRequestSyncStatus(): Promise<void> {
+		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: this.lastStatusEventBody });
 	}
 }
 
