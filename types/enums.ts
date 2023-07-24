@@ -9,6 +9,7 @@ export enum EventName {
 	DOM_PARSER_READY = 'dom_parser_ready',
 	LEETIFY_ACCESS_TOKEN = 'leetify_access_token',
 	LEETIFY_ACCESS_TOKEN_REQUEST = 'leetify_access_token_request',
+	OPTION_UPDATED = 'option_updated',
 	PARSE_STEAM_GCPD_RESPONSE = 'parse_steam_gcpd_response',
 	SYNC_STATUS = 'sync_status',
 }

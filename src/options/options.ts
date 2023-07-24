@@ -1,4 +1,4 @@
-import { SyncStorageKey } from '../../types/enums';
+import { EventName, SyncStorageKey } from '../../types/enums';
 import { getOptionDefaults } from '../constants';
 
 interface Option {
@@ -53,6 +53,11 @@ const options: Option[] = [
 
 		checkbox.addEventListener('change', async () => {
 			await chrome.storage.sync.set({ [option.key]: checkbox.checked });
+
+			await chrome.runtime.sendMessage({
+				event: EventName.OPTION_UPDATED,
+				data: { key: option.key, value: checkbox.checked },
+			});
 		});
 
 		const label = document.createElement('label');

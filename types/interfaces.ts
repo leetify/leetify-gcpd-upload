@@ -1,5 +1,5 @@
 // TODO cleanup
-import { EventName } from './enums';
+import { EventName, SyncStorageKey } from './enums';
 
 export interface LeetifyAccessTokenEventBody {
 	accessToken: string | null;
@@ -37,3 +37,15 @@ export interface ParseSteamGcpdResponseResponse {
 	cells: number;
 	matches: GcpdMatch[];
 }
+
+export interface OptionUpdatedEventBody {
+	key: SyncStorageKey;
+	value: boolean;
+}
+
+export const isOptionUpdatedEventBody = (v: any): v is OptionUpdatedEventBody => typeof v === 'object'
+	&& v.hasOwnProperty('key')
+	&& typeof v.key === 'string'
+	&& Object.values(SyncStorageKey).includes(v.key)
+	&& v.hasOwnProperty('value')
+	&& typeof v.value === 'boolean';
