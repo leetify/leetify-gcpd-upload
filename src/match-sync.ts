@@ -1,7 +1,6 @@
 import { defer } from './helpers/defer';
 import { EventName, GcpdError, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
 import { GcpdMatch, isLeetifyAccessTokenEventBody, isRuntimeMessage, SyncStatusEventBody } from '../types/interfaces';
-import { SyncForegroundTab } from './sync-foreground-tab';
 import { Gcpd } from './gcpd';
 import { syncStorageKey } from './helpers/sync-storage-key';
 import { getOptionDefaults } from './constants';
@@ -63,7 +62,8 @@ class MatchSync {
 	public async setStatus(eventBody: SyncStatusEventBody): Promise<void> {
 		this.lastStatusEventBody = eventBody;
 
-		if (!await SyncForegroundTab.exists()) return;
+		// TODO it seems like there's currently no good way to find all tabs "owned" by this extension, so for now, we'll just always try to send a status message
+		// if (!await SyncForegroundTab.exists()) return;
 
 		try {
 			await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: eventBody });
