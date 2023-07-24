@@ -55,6 +55,7 @@ class MatchSync {
 
 			await this.setStatus({ status: SyncStatus.DONE });
 		} finally {
+			this.leetifyAccessTokenPromise = null;
 			await chrome.offscreen.closeDocument().catch(() => {});
 			this.inProgress = false;
 		}
