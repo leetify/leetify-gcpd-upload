@@ -3,11 +3,13 @@ import { isOptionUpdatedEventBody, isRuntimeMessage } from '../types/interfaces'
 import { BackgroundSync } from './background-sync';
 import { MatchSync } from './match-sync';
 import { SyncForegroundTab } from './sync-foreground-tab';
+import { SyncOnPageVisit } from './sync-on-page-visit';
 import { stripFrameOptionsHeadersFromLeetifyRequests } from './helpers/strip-frame-options-headers-from-leetify-requests';
 
 const onStartupOrInstalled = async (): Promise<void> => {
 	// TODO make sure this doesn't cause duplicates
 	await stripFrameOptionsHeadersFromLeetifyRequests();
+	await SyncOnPageVisit.applyListener();
 
 	// TODO make sure this doesn't cause duplicates
 	if (await BackgroundSync.shouldRunOnInterval()) {
@@ -38,15 +40,17 @@ const handleOptionUpdated = async (data: Record<string, any>): Promise<void> => 
 			return BackgroundSync.unsetAlarm();
 		}
 
-		// TODO enable/disable listener
-		// case SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD: {
-		// 	break;
-		// }
+		case SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD: {
+			SyncOnPageVisit.updateSyncOnVisitGcpdCache(data.value);
+			await SyncOnPageVisit.applyListener();
+			break;
+		}
 
-		// TODO enable/disable listener
-		// case SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY: {
-		// 	break;
-		// }
+		case SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY: {
+			SyncOnPageVisit.updateSyncOnVisitLeetifyCache(data.value);
+			await SyncOnPageVisit.applyListener();
+			break;
+		}
 
 		case SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN: {
 			if (!data.value) return; // when a data source gets disabled, we don't have to do anything
