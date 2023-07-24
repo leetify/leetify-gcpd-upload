@@ -2,7 +2,7 @@ import { EventName, GcpdTab, SyncStatus } from '../../types/enums';
 import { isRuntimeMessage, isSyncStatusEventBody, SyncStatusEventBody } from '../../types/interfaces';
 
 const triggerSyncButton = document.querySelector('button#trigger-sync');
-if (triggerSyncButton) triggerSyncButton.addEventListener('click', () => chrome.runtime.sendMessage({ event: EventName.REQUEST_MATCH_SYNC }))
+if (triggerSyncButton) triggerSyncButton.addEventListener('click', () => chrome.runtime.sendMessage({ event: EventName.REQUEST_MATCH_SYNC }));
 
 const getFriendlyStatus = (data: SyncStatusEventBody): string => {
 	switch (data.status) {
@@ -28,7 +28,7 @@ const handleSyncStatus = (data: Record<string, any>): void => {
 	const log = document.querySelector('#log') as HTMLElement;
 
 	const div = document.createElement('div');
-	div.innerText = new Date() + ' ' + JSON.stringify(data);
+	div.innerText = `${new Date()} ${JSON.stringify(data)}`;
 	log.appendChild(div);
 
 	const friendlyStatusElement = document.querySelector('#friendly-status') as HTMLElement;

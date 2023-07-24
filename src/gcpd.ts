@@ -52,7 +52,7 @@ class Gcpd {
 		if (continueToken) url.searchParams.set('continue_token', continueToken);
 
 		const res = await fetch(url);
-		if (!/^https:\/\/steamcommunity\.com\/(id\/[^\/]+|profiles\/\d+)\/gcpd\/730/.test(res.url)) return GcpdError.STEAM_AUTH_FAILED;
+		if (!/^https:\/\/steamcommunity\.com\/(id\/[^/]+|profiles\/\d+)\/gcpd\/730/.test(res.url)) return GcpdError.STEAM_AUTH_FAILED;
 
 		const json = await res.json();
 		if (!isSteamGcpdResponse(json)) return GcpdError.INVALID_RESPONSE;
