@@ -60,11 +60,16 @@ const handleOptionUpdated = async (data: Record<string, any>): Promise<void> => 
 	}
 };
 
+const handleRequestMatchSync = async (): Promise<void> => {
+	await MatchSync.run();
+};
+
 chrome.runtime.onMessage.addListener((message, sender): any => {
 	if (sender.id !== chrome.runtime.id) return;
 	if (!isRuntimeMessage(message)) return;
 
 	switch (message.event) {
 		case EventName.OPTION_UPDATED: return handleOptionUpdated(message.data);
+		case EventName.REQUEST_MATCH_SYNC: return handleRequestMatchSync();
 	}
 });

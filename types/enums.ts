@@ -11,6 +11,7 @@ export enum DeclarativeNetRequestRuleId {
 export enum EventName {
 	LEETIFY_ACCESS_TOKEN = 'leetify_access_token',
 	OPTION_UPDATED = 'option_updated',
+	REQUEST_MATCH_SYNC = 'request_match_sync',
 	REQUEST_PARSE_STEAM_GCPD = 'request_parse_steam_gcpd',
 	REQUEST_SYNC_STATUS = 'request_sync_status',
 	SYNC_STATUS = 'sync_status',

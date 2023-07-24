@@ -21,9 +21,10 @@ export const isRuntimeMessage = (v: any): v is RuntimeMessage => typeof v === 'o
 	&& typeof v.event === 'string'
 	&& Object.values(EventName).includes(v.event)
 	&& (
-		(
-			v.event === EventName.REQUEST_SYNC_STATUS
-		)
+		[
+			EventName.REQUEST_MATCH_SYNC,
+			EventName.REQUEST_SYNC_STATUS,
+		].includes(v.event)
 		|| (
 			v.hasOwnProperty('data')
 			&& typeof v === 'object'
