@@ -1,22 +1,22 @@
 /* eslint-disable no-shadow */
-// TODO cleanup
 
 export enum AlarmName {
 	BACKGROUND_SYNC = 'background_sync',
 }
 
+export enum DeclarativeNetRequestRuleId {
+	STRIP_FRAME_OPTIONS_HEADERS_FROM_LEETIFY_REQUESTS = 1,
+}
+
 export enum EventName {
-	DOM_PARSER_READY = 'dom_parser_ready',
 	LEETIFY_ACCESS_TOKEN = 'leetify_access_token',
-	LEETIFY_ACCESS_TOKEN_REQUEST = 'leetify_access_token_request',
 	OPTION_UPDATED = 'option_updated',
-	PARSE_STEAM_GCPD_RESPONSE = 'parse_steam_gcpd_response',
+	PARSE_STEAM_GCPD = 'parse_steam_gcpd',
 	SYNC_STATUS = 'sync_status',
 }
 
 export enum SyncStatus {
 	WAITING_FOR_LEETIFY_AUTH = 'waiting_for_leetify_auth',
-	LEETIFY_AUTH_EVENT_RECEIVED = 'leetify_auth_event_received',
 	LEETIFY_AUTH_FAILED = 'leetify_auth_failed',
 	LEETIFY_AUTH_SUCCESSFUL = 'leetify_auth_successful',
 	GCPD_PARSER_INITIALIZING = 'gcpd_parser_initializing',
@@ -33,10 +33,6 @@ export enum SyncStatus {
 export enum GcpdTab {
 	SCRIMMAGE = 'matchhistoryscrimmage',
 	WINGMAN = 'matchhistorywingman',
-}
-
-export enum SessionStorageKey {
-	LEETIFY_ACCESS_TOKEN = 'leetify_access_token',
 }
 
 export enum SyncStorageKey {

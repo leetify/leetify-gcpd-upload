@@ -25,6 +25,8 @@ class MatchSync {
 		this.inProgress = true;
 
 		try {
+			await this.sendMessageIfSyncForegroundPageExists({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.WAITING_FOR_LEETIFY_AUTH } });
+
 			this.leetifyAccessTokenPromise = defer<string | null>();
 
 			chrome.offscreen.createDocument({

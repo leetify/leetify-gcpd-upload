@@ -1,4 +1,3 @@
-// TODO cleanup
 import { EventName, SyncStorageKey } from './enums';
 
 export interface LeetifyAccessTokenEventBody {
@@ -25,18 +24,44 @@ export const isRuntimeMessage = (v: any): v is RuntimeMessage => typeof v === 'o
 	&& typeof v === 'object'
 	&& !Array.isArray(v);
 
-export type RuntimeMessageListener = (message: any, sender: chrome.runtime.MessageSender, sendResponse: () => void) => boolean | undefined;
-
 export interface GcpdMatch {
 	ranked: boolean;
 	timestamp: string;
 	url: string;
 }
 
-export interface ParseSteamGcpdResponseResponse {
+export const isGcpdMatch = (v: any): v is GcpdMatch => typeof v === 'object'
+	&& v.hasOwnProperty('ranked')
+	&& typeof v.ranked === 'boolean'
+	&& v.hasOwnProperty('timestamp')
+	&& typeof v.timestamp === 'string'
+	&& v.hasOwnProperty('url')
+	&& typeof v.url === 'string';
+
+export interface ParseSteamGcpdEventResponseBody {
 	cells: number;
 	matches: GcpdMatch[];
 }
+
+export const isParseSteamGcpdEventResponseBody = (v: any): v is ParseSteamGcpdEventResponseBody => typeof v === 'object'
+	&& v.hasOwnProperty('cells')
+	&& typeof v.cells === 'number'
+	&& v.hasOwnProperty('matches')
+	&& Array.isArray(v.matches)
+	&& v.matches.every((m: any) => isGcpdMatch(m));
+
+export interface ParseSteamGcpdEventBody {
+	html: string;
+	previouslyFoundMatchTimestamp?: string;
+}
+
+export const isParseSteamGcpdEventBody = (v: any): v is ParseSteamGcpdEventBody => typeof v === 'object'
+	&& v.hasOwnProperty('html')
+	&& typeof v.html === 'string'
+	&& (
+		!v.hasOwnProperty('previouslyFoundMatchTimestamp')
+		|| typeof v.previouslyFoundMatchTimestamp === 'string'
+	);
 
 export interface OptionUpdatedEventBody {
 	key: SyncStorageKey;

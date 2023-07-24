@@ -1,4 +1,4 @@
-import { GcpdMatch, ParseSteamGcpdResponseResponse } from '../types/interfaces';
+import { GcpdMatch, isParseSteamGcpdEventResponseBody } from '../types/interfaces';
 import { EventName, GcpdTab, SyncStatus } from '../types/enums';
 import { syncStorageKey } from './helpers/sync-storage-key';
 
@@ -55,10 +55,11 @@ class Gcpd {
 
 		if (!isSteamGcpdResponse(json)) return matches;
 
-		const parsed: ParseSteamGcpdResponseResponse = await chrome.runtime.sendMessage({
-			event: EventName.PARSE_STEAM_GCPD_RESPONSE,
+		const parsed = await chrome.runtime.sendMessage({
+			event: EventName.PARSE_STEAM_GCPD,
 			data: { html: json.html, previouslyFoundMatchTimestamp },
 		});
+		if (!isParseSteamGcpdEventResponseBody(parsed)) return matches;
 
 		matches.push(...parsed.matches);
 

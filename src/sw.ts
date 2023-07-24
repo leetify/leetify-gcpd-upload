@@ -38,15 +38,15 @@ const handleOptionUpdated = async (data: Record<string, any>): Promise<void> => 
 			return BackgroundSync.unsetAlarm();
 		}
 
-		case SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD: {
-			// TODO enable/disable listener
-			break;
-		}
+		// TODO enable/disable listener
+		// case SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD: {
+		// 	break;
+		// }
 
-		case SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY: {
-			// TODO enable/disable listener
-			break;
-		}
+		// TODO enable/disable listener
+		// case SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY: {
+		// 	break;
+		// }
 
 		case SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN: {
 			if (!data.value) return; // when a data source gets disabled, we don't have to do anything

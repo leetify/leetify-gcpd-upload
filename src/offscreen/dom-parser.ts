@@ -1,21 +1,8 @@
 import { EventName } from '../../types/enums';
-import { isRuntimeMessage, GcpdMatch, ParseSteamGcpdResponseResponse } from '../../types/interfaces';
+import { isParseSteamGcpdEventBody, isRuntimeMessage, GcpdMatch, ParseSteamGcpdEventResponseBody } from '../../types/interfaces';
 
-interface ParseSteamGcpdResponseMessage {
-	html: string;
-	previouslyFoundMatchTimestamp?: string;
-}
-
-const isParseSteamGcpdResponseMessage = (v: any): v is ParseSteamGcpdResponseMessage => typeof v === 'object'
-	&& v.hasOwnProperty('html')
-	&& typeof v.html === 'string'
-	&& (
-		!v.hasOwnProperty('previouslyFoundMatchTimestamp')
-		|| typeof v.previouslyFoundMatchTimestamp === 'string'
-	);
-
-const parseSteamGcpdResponse = (message: Record<string, any>, sendResponse: (r: ParseSteamGcpdResponseResponse) => void) => {
-	if (!isParseSteamGcpdResponseMessage(message)) return;
+const parseSteamGcpd = (message: Record<string, any>, sendResponse: (r: ParseSteamGcpdEventResponseBody) => void) => {
+	if (!isParseSteamGcpdEventBody(message)) return;
 
 	const dom = new DOMParser().parseFromString(message.html, 'text/html');
 	const cells = dom.querySelectorAll('td.val_left');
@@ -53,6 +40,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
 	if (!isRuntimeMessage(message)) return;
 
 	switch (message.event) {
-		case EventName.PARSE_STEAM_GCPD_RESPONSE: return parseSteamGcpdResponse(message.data, sendResponse);
+		case EventName.PARSE_STEAM_GCPD: return parseSteamGcpd(message.data, sendResponse);
 	}
 });
