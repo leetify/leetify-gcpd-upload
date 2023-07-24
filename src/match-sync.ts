@@ -62,6 +62,8 @@ class MatchSync {
 	public async setStatus(eventBody: SyncStatusEventBody): Promise<void> {
 		this.lastStatusEventBody = eventBody;
 
+		await this.setActionBadge(eventBody.status);
+
 		// TODO it seems like there's currently no good way to find all tabs "owned" by this extension, so for now, we'll just always try to send a status message
 		// if (!await SyncForegroundTab.exists()) return;
 
@@ -200,6 +202,29 @@ class MatchSync {
 
 	protected async handleRequestSyncStatus(): Promise<void> {
 		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: this.lastStatusEventBody });
+	}
+
+	protected setActionBadge(syncStatus: SyncStatus): Promise<unknown> {
+		switch (syncStatus) {
+			case SyncStatus.LEETIFY_AUTH_FAILED:
+			case SyncStatus.STEAM_AUTH_FAILED:
+				return Promise.all([
+					chrome.action.setBadgeBackgroundColor({ color: '#de425b' }),
+					chrome.action.setBadgeText({ text: 'ERR' }),
+					chrome.action.setBadgeTextColor({ color: '#000' }),
+				]);
+
+			case SyncStatus.INVALID_GCPD_RESPONSE:
+			case SyncStatus.UPLOADING_TO_LEETIFY_FAILED:
+				return Promise.all([
+					chrome.action.setBadgeBackgroundColor({ color: '#fb9d5a' }),
+					chrome.action.setBadgeText({ text: 'fail' }),
+					chrome.action.setBadgeTextColor({ color: '#000' }),
+				]);
+
+			default:
+				return chrome.action.setBadgeText({ text: '' });
+		}
 	}
 }
 
