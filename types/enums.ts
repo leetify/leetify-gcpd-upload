@@ -41,4 +41,10 @@ export enum SessionStorageKey {
 export enum SyncStorageKey {
 	FOUND_MATCH_TIMESTAMP_SCRIMMAGE = 'found_match_timestamp_scrimmage',
 	FOUND_MATCH_TIMESTAMP_WINGMAN = 'found_match_timestamp_wingman',
+	OPTION_SYNC_ON_INTERVAL = 'option_sync_on_interval',
+	OPTION_SYNC_ON_VISIT_GCPD = 'option_sync_on_visit_gcpd',
+	OPTION_SYNC_ON_VISIT_LEETIFY = 'option_sync_on_visit_leetify',
+	OPTION_SYNC_RANKED_WINGMAN = 'option_sync_ranked_wingman',
+	OPTION_SYNC_UNRANKED_5V5 = 'option_sync_unranked_5v5',
+	OPTION_SYNC_UNRANKED_WINGMAN = 'option_sync_unranked_wingman',
 }

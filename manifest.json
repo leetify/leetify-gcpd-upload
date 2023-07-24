@@ -3,6 +3,13 @@
 	"name": "Leetify Unranked Uploader",
 	"description": "Auto-upload Counter-Strike demos from unranked Matchmaking to Leetify",
 	"version": "0.0.1",
+	"homepage_url": "https://leetify.com",
+	"options_page": "src/options/options.html",
+
+	"options_ui": {
+		"page": "src/options/options.html",
+		"open_in_tab": true
+	},
 
 	"icons": {
 		"16": "assets/icons/16.png",
