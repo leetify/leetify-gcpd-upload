@@ -1,0 +1,21 @@
+:root {
+	--surface1: #19171e;
+	--text-color: #ced7e0;
+}
+
+*,
+*::after,
+*::before {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 62.5%;
+}
+
+body {
+	background: var(--surface1);
+	color: var(--text-color);
+	font: 1.6rem/1.5 'Poppins', system-ui, ui-sans-serif, 'Ubuntu', 'Open Sans', 'Segoe UI Variable', 'Segoe UI', 'Roboto', 'Calibri', 'Helvetica Neue', 'Arial', sans-serif;
+}

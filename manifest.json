@@ -30,6 +30,8 @@
 
 	"content_scripts": [
 		{
+			"all_frames": true,
+
 			"matches": [
 				"https://leetify.test/*" // TODO
 			],
@@ -42,12 +44,14 @@
 
 	"permissions": [
 		"alarms",
+		"declarativeNetRequestWithHostAccess",
 		"offscreen",
 		"storage",
 		"webRequest"
 	],
 
 	"host_permissions": [
+		"https://leetify.test/*",
 		"https://steamcommunity.com/my/gcpd/730"
 	]
 }

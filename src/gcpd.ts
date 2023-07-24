@@ -1,5 +1,5 @@
 import { GcpdMatch, ParseSteamGcpdResponseResponse } from '../types/interfaces';
-import { EventName, GcpdTab } from '../types/enums';
+import { EventName, GcpdTab, SyncStatus } from '../types/enums';
 import { syncStorageKey } from './helpers/sync-storage-key';
 
 interface SteamGcpdResponse {
@@ -22,22 +22,10 @@ const isSteamGcpdResponse = (v: any): v is SteamGcpdResponse => typeof v === 'ob
 
 class Gcpd {
 	public async fetchAllMatches(tab: GcpdTab): Promise<GcpdMatch[]> {
-		// Chrome only allows one offscreen document at a time -- so if we try to run this twice at once, it'll throw an error right here and prevent that
-		await chrome.offscreen.createDocument({
-			justification: 'Parse Steam API response',
-			reasons: ['DOM_PARSER'],
-			url: 'src/dom-parser.html',
-		});
-
 		const previouslyFoundMatchTimestampKey = syncStorageKey(tab);
 		const { [previouslyFoundMatchTimestampKey]: previouslyFoundMatchTimestamp } = await chrome.storage.sync.get(previouslyFoundMatchTimestampKey);
 
-		try {
-			const matches = await this.fetchMatchesRecursively({ tab, previouslyFoundMatchTimestamp, matches: [] });
-			return matches;
-		} finally {
-			await chrome.offscreen.closeDocument();
-		}
+		return this.fetchMatchesRecursively({ tab, previouslyFoundMatchTimestamp, matches: [] });
 	}
 
 	private async fetchMatchesRecursively({
@@ -54,6 +42,8 @@ class Gcpd {
 		tab: GcpdTab;
 	}): Promise<GcpdMatch[]> {
 		depth = depth === undefined ? 1 : depth;
+
+		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { depth, status: SyncStatus.REQUESTING_GCPD_PAGE } });
 
 		const url = new URL('https://steamcommunity.com/my/gcpd/730');
 		url.searchParams.set('ajax', '1');

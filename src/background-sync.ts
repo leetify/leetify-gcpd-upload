@@ -1,5 +1,5 @@
 import { AlarmName } from '../types/enums';
-import { syncAllMatches } from './helpers/sync-matches';
+import { MatchSync } from './match-sync';
 
 class BackgroundSync {
 	public async setAlarm(): Promise<void> {
@@ -14,7 +14,7 @@ class BackgroundSync {
 	}
 
 	public async handleAlarm(): Promise<void> {
-		await syncAllMatches();
+		await MatchSync.run();
 	}
 }
 

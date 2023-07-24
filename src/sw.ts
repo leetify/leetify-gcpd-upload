@@ -1,31 +1,49 @@
-import { AlarmName, EventName } from '../types/enums';
-import { isRuntimeMessage } from '../types/interfaces';
-import { LeetifyAccessToken } from './leetify-access-token';
+import { AlarmName } from '../types/enums';
 import { BackgroundSync } from './background-sync';
-import { syncAllMatches } from './helpers/sync-matches';
+import { MatchSync } from './match-sync';
+import { SyncForegroundTab } from './sync-foreground-tab';
 
 const onStartupOrInstalled = async (): Promise<void> => {
-	await LeetifyAccessToken.tryToFetchLeetifyAccessToken();
 	await BackgroundSync.setAlarm();
+	await stripFrameOptionsHeadersFromLeetifyRequests();
+};
+
+// TODO make sure this only applies within the extension
+const stripFrameOptionsHeadersFromLeetifyRequests = async (): Promise<void> => {
+	const rule: chrome.declarativeNetRequest.Rule = {
+		id: 1,
+
+		condition: {
+			initiatorDomains: [chrome.runtime.id],
+			requestDomains: ['leetify.test'],
+			resourceTypes: ['sub_frame'],
+		},
+
+		action: {
+			type: 'modifyHeaders',
+
+			responseHeaders: [
+				{ header: 'X-Frame-Options', operation: 'remove' },
+				{ header: 'Frame-Options', operation: 'remove' },
+			],
+		},
+	};
+
+	await chrome.declarativeNetRequest.updateDynamicRules({
+		removeRuleIds: [rule.id],
+		addRules: [rule],
+	});
 };
 
 chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
 chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
 
-chrome.action.onClicked.addListener(async (tab) => {
-	await syncAllMatches();
+chrome.action.onClicked.addListener(async (tab): Promise<void> => {
+	await SyncForegroundTab.openOrFocus();
+	await MatchSync.run();
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
-	if (sender.id !== chrome.runtime.id) return; // message was not sent from our extension
-	if (!isRuntimeMessage(message)) return;
-
-	switch (message.event) {
-		case EventName.LEETIFY_ACCESS_TOKEN: return LeetifyAccessToken.handleEvent(message.data);
-	}
-});
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
+chrome.alarms.onAlarm.addListener(async (alarm): Promise<void> => {
 	switch (alarm.name) {
 		case AlarmName.BACKGROUND_SYNC: return BackgroundSync.handleAlarm();
 	}
