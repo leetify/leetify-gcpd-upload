@@ -1,7 +1,7 @@
 import { tabExists } from './helpers/tab-exists';
 
 class SyncForegroundTab {
-	protected static readonly URL = 'src/sync-foreground/sync-foreground.html'
+	protected static readonly URL = 'src/sync-foreground/sync-foreground.html';
 
 	protected tab: chrome.tabs.Tab | null = null;
 

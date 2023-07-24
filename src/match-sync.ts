@@ -7,8 +7,8 @@ import { syncStorageKey } from './helpers/sync-storage-key';
 import { getOptionDefaults } from './constants';
 
 class MatchSync {
+	protected inProgress = false;
 	protected leetifyAccessTokenPromise: ReturnType<typeof defer<string | null>> | null = null;
-	protected syncInProgress = false;
 
 	public constructor() {
 		this.setupListeners();
@@ -18,11 +18,11 @@ class MatchSync {
 		if (!await SyncForegroundTab.exists()) return;
 
 		await chrome.runtime.sendMessage(message);
-	};
+	}
 
 	public async run(): Promise<void> {
-		if (this.syncInProgress) return;
-		this.syncInProgress = true;
+		if (this.inProgress) return;
+		this.inProgress = true;
 
 		try {
 			this.leetifyAccessTokenPromise = defer<string | null>();
@@ -59,7 +59,7 @@ class MatchSync {
 			await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.DONE } });
 		} finally {
 			await chrome.offscreen.closeDocument().catch(() => {});
-			this.syncInProgress = false;
+			this.inProgress = false;
 		}
 	}
 
@@ -96,7 +96,7 @@ class MatchSync {
 			},
 		});
 
-		if (response.status !== 204) return await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED } });
+		if (response.status !== 204) return chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED } });
 
 		await chrome.storage.sync.set({
 			[syncStorageKey(tab)]: matches[0].timestamp,
@@ -141,7 +141,7 @@ class MatchSync {
 
 	protected setupListeners(): void {
 		chrome.runtime.onMessage.addListener((message, sender): any => {
-			console.log('from match sync', message)
+			console.log('from match sync', message);
 
 			if (sender.id !== chrome.runtime.id) return; // message was not sent from our extension
 			if (!isRuntimeMessage(message)) return;

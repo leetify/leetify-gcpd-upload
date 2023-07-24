@@ -1,7 +1,7 @@
 import { EventName } from '../../types/enums';
 
 (async () => {
-    if (window.location.toString() !== 'https://leetify.test/gcpd-extension-auth') return;
+	if (window.location.toString() !== 'https://leetify.test/gcpd-extension-auth') return;
 
 	document.write('');
 

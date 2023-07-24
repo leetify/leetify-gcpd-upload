@@ -3,43 +3,17 @@ import { isOptionUpdatedEventBody, isRuntimeMessage } from '../types/interfaces'
 import { BackgroundSync } from './background-sync';
 import { MatchSync } from './match-sync';
 import { SyncForegroundTab } from './sync-foreground-tab';
+import { stripFrameOptionsHeadersFromLeetifyRequests } from './helpers/strip-frame-options-headers-from-leetify-requests';
 
 const onStartupOrInstalled = async (): Promise<void> => {
 	await BackgroundSync.setAlarm();
 	await stripFrameOptionsHeadersFromLeetifyRequests();
 };
 
-// TODO make sure this only applies within the extension
-const stripFrameOptionsHeadersFromLeetifyRequests = async (): Promise<void> => {
-	const rule: chrome.declarativeNetRequest.Rule = {
-		id: 1,
-
-		condition: {
-			initiatorDomains: [chrome.runtime.id],
-			requestDomains: ['leetify.test'],
-			resourceTypes: ['sub_frame'],
-		},
-
-		action: {
-			type: 'modifyHeaders',
-
-			responseHeaders: [
-				{ header: 'X-Frame-Options', operation: 'remove' },
-				{ header: 'Frame-Options', operation: 'remove' },
-			],
-		},
-	};
-
-	await chrome.declarativeNetRequest.updateDynamicRules({
-		removeRuleIds: [rule.id],
-		addRules: [rule],
-	});
-};
-
 chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
 chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
 
-chrome.action.onClicked.addListener(async (tab): Promise<void> => {
+chrome.action.onClicked.addListener(async (): Promise<void> => {
 	await SyncForegroundTab.openOrFocus();
 	await MatchSync.run();
 });
@@ -71,12 +45,12 @@ const handleOptionUpdated = async (data: Record<string, any>): Promise<void> => 
 
 		case SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN: {
 			if (!data.value) return; // when a data source gets disabled, we don't have to do anything
-			return await chrome.storage.sync.remove(SyncStorageKey.FOUND_MATCH_TIMESTAMP_WINGMAN); // when this gets enabled, clear the timestamp so we can get earlier matches
+			return chrome.storage.sync.remove(SyncStorageKey.FOUND_MATCH_TIMESTAMP_WINGMAN); // when this gets enabled, clear the timestamp so we can get earlier matches
 		}
 
 		case SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN: {
 			if (!data.value) return; // when a data source gets disabled, we don't have to do anything
-			return await chrome.storage.sync.remove(SyncStorageKey.FOUND_MATCH_TIMESTAMP_WINGMAN); // when this gets enabled, clear the timestamp so we can get earlier matches
+			return chrome.storage.sync.remove(SyncStorageKey.FOUND_MATCH_TIMESTAMP_WINGMAN); // when this gets enabled, clear the timestamp so we can get earlier matches
 		}
 	}
 };
