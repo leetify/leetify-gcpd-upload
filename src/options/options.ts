@@ -1,18 +1,10 @@
 import { SyncStorageKey } from '../../types/enums';
+import { getOptionDefaults } from '../constants';
 
 interface Option {
 	key: SyncStorageKey;
 	label: string;
 }
-
-const defaults: { [key in SyncStorageKey]?: boolean } = {
-	[SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN]: true,
-	[SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN]: true,
-	[SyncStorageKey.OPTION_SYNC_UNRANKED_5V5]: true,
-	[SyncStorageKey.OPTION_SYNC_ON_INTERVAL]: true,
-	[SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY]: true,
-	[SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD]: true,
-};
 
 const options: Option[] = [
 	{
@@ -50,7 +42,7 @@ const options: Option[] = [
 	const checkboxContainer = document.querySelector('div#checkbox-container') as HTMLDivElement;
 
 	const values = Object.assign(
-		{ ...defaults },
+		getOptionDefaults(),
 		await chrome.storage.sync.get(options.map(({ key }) => key)),
 	);
 

@@ -39,7 +39,10 @@ const parseSteamGcpdResponse = (message: Record<string, any>, sendResponse: (r: 
 		// if this match is older or as old as the latest match we've found previously, we don't need to upload it (or any following matches)
 		if (timestampLimit && new Date(timestamp) <= timestampLimit) break;
 
-		matches.push({ timestamp, url });
+		const rankedElement = cell.querySelector('table.csgo_scoreboard_inner_left tbody tr:nth-child(3) td') as HTMLTableCellElement | null;
+		const ranked = !!(rankedElement && rankedElement.innerText.trim() === 'Ranked: Yes');
+
+		matches.push({ ranked, timestamp, url });
 	}
 
 	return sendResponse({ cells: cells.length, matches });

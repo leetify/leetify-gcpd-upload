@@ -1,9 +1,10 @@
 import { defer } from './helpers/defer';
-import { EventName, GcpdTab, SyncStatus } from '../types/enums';
-import { isLeetifyAccessTokenEventBody, isRuntimeMessage, RuntimeMessage } from '../types/interfaces';
+import { EventName, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
+import { GcpdMatch, isLeetifyAccessTokenEventBody, isRuntimeMessage, RuntimeMessage } from '../types/interfaces';
 import { SyncForegroundTab } from './sync-foreground-tab';
 import { Gcpd } from './gcpd';
 import { syncStorageKey } from './helpers/sync-storage-key';
+import { getOptionDefaults } from './constants';
 
 class MatchSync {
 	protected leetifyAccessTokenPromise: ReturnType<typeof defer<string | null>> | null = null;
@@ -68,9 +69,12 @@ class MatchSync {
 	}
 
 	protected async syncMatches(tab: GcpdTab, leetifyAccessToken: string): Promise<void> {
+		const shouldSync = await this.shouldSync(tab);
+		if (!shouldSync) return;
+
 		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { tab, status: SyncStatus.BEGINNING_SYNC } });
 
-		const matches = await Gcpd.fetchAllMatches(tab);
+		const matches = this.filterMatches(await Gcpd.fetchAllMatches(tab), shouldSync);
 		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { status: SyncStatus.FINISHED_GCPD, found: matches.length } });
 		if (!matches.length) return;
 
@@ -78,7 +82,13 @@ class MatchSync {
 
 		const response = await fetch('https://api.leetify.test/api/upload-from-url', { // TODO
 			method: 'POST',
-			body: JSON.stringify({ matches }),
+
+			body: JSON.stringify({
+				matches: matches.map((match) => ({
+					url: match.url,
+					timestamp: match.timestamp,
+				})),
+			}),
 
 			headers: {
 				'Content-Type': 'application/json',
@@ -95,8 +105,42 @@ class MatchSync {
 		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: { tab, status: SyncStatus.FINISHED_SYNC } });
 	}
 
+	protected filterMatches(matches: GcpdMatch[], shouldSync: boolean | 'ranked_only' | 'unranked_only'): GcpdMatch[] {
+		switch (shouldSync) {
+			case 'ranked_only': return matches.filter(({ ranked }) => ranked);
+			case 'unranked_only': return matches.filter(({ ranked }) => !ranked);
+			default: return matches;
+		}
+	}
+
+	protected async shouldSync(tab: GcpdTab): Promise<boolean | 'ranked_only' | 'unranked_only'> {
+		const defaults = getOptionDefaults();
+
+		switch (tab) {
+			case GcpdTab.SCRIMMAGE: {
+				const { [SyncStorageKey.OPTION_SYNC_UNRANKED_5V5]: shouldSync } = await chrome.storage.sync.get(SyncStorageKey.OPTION_SYNC_UNRANKED_5V5);
+				return shouldSync ?? defaults[SyncStorageKey.OPTION_SYNC_UNRANKED_5V5];
+			}
+
+			case GcpdTab.WINGMAN: {
+				const { ranked, unranked } = await chrome.storage.sync.get([
+					SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN,
+					SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN,
+				]).then((items) => ({
+					ranked: items[SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN] ?? defaults[SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN],
+					unranked: items[SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN] ?? defaults[SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN],
+				}));
+
+				if (ranked && unranked) return true;
+				if (ranked) return 'ranked_only';
+				if (unranked) return 'unranked_only';
+				return false;
+			}
+		}
+	}
+
 	protected setupListeners(): void {
-		chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
+		chrome.runtime.onMessage.addListener((message, sender): any => {
 			console.log('from match sync', message)
 
 			if (sender.id !== chrome.runtime.id) return; // message was not sent from our extension

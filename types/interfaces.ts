@@ -28,6 +28,7 @@ export const isRuntimeMessage = (v: any): v is RuntimeMessage => typeof v === 'o
 export type RuntimeMessageListener = (message: any, sender: chrome.runtime.MessageSender, sendResponse: () => void) => boolean | undefined;
 
 export interface GcpdMatch {
+	ranked: boolean;
 	timestamp: string;
 	url: string;
 }
