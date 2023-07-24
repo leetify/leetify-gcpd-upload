@@ -1,5 +1,5 @@
 import { GcpdMatch, isParseSteamGcpdEventResponseBody } from '../types/interfaces';
-import { EventName, GcpdTab, SyncStatus } from '../types/enums';
+import { EventName, GcpdError, GcpdTab, SyncStatus } from '../types/enums';
 import { syncStorageKey } from './helpers/sync-storage-key';
 import { MatchSync } from './match-sync';
 
@@ -22,7 +22,7 @@ const isSteamGcpdResponse = (v: any): v is SteamGcpdResponse => typeof v === 'ob
 	&& v.success === true;
 
 class Gcpd {
-	public async fetchAllMatches(tab: GcpdTab): Promise<GcpdMatch[]> {
+	public async fetchAllMatches(tab: GcpdTab): Promise<GcpdMatch[] | GcpdError> {
 		const previouslyFoundMatchTimestampKey = syncStorageKey(tab);
 		const { [previouslyFoundMatchTimestampKey]: previouslyFoundMatchTimestamp } = await chrome.storage.sync.get(previouslyFoundMatchTimestampKey);
 
@@ -41,7 +41,7 @@ class Gcpd {
 		matches: GcpdMatch[];
 		previouslyFoundMatchTimestamp: string | undefined;
 		tab: GcpdTab;
-	}): Promise<GcpdMatch[]> {
+	}): Promise<GcpdMatch[] | GcpdError> {
 		depth = depth === undefined ? 1 : depth;
 
 		await MatchSync.setStatus({ depth, status: SyncStatus.REQUESTING_GCPD_PAGE });
@@ -52,15 +52,16 @@ class Gcpd {
 		if (continueToken) url.searchParams.set('continue_token', continueToken);
 
 		const res = await fetch(url);
-		const json = await res.json();
+		if (!/^https:\/\/steamcommunity\.com\/(id\/[^\/]+|profiles\/\d+)\/gcpd\/730/.test(res.url)) return GcpdError.STEAM_AUTH_FAILED;
 
-		if (!isSteamGcpdResponse(json)) return matches;
+		const json = await res.json();
+		if (!isSteamGcpdResponse(json)) return GcpdError.INVALID_RESPONSE;
 
 		const parsed = await chrome.runtime.sendMessage({
 			event: EventName.REQUEST_PARSE_STEAM_GCPD,
 			data: { html: json.html, previouslyFoundMatchTimestamp },
 		});
-		if (!isParseSteamGcpdEventResponseBody(parsed)) return matches;
+		if (!isParseSteamGcpdEventResponseBody(parsed)) return GcpdError.INVALID_RESPONSE;
 
 		matches.push(...parsed.matches);
 

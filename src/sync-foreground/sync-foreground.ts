@@ -12,9 +12,11 @@ const getFriendlyStatus = (data: SyncStatusEventBody): string => {
 		case SyncStatus.FINISHED_SYNC: return `Synchronized ${data.tab === GcpdTab.WINGMAN ? 'Wingman' : 'Unranked 5v5'} matches.`;
 		case SyncStatus.GCPD_PARSER_INITIALIZED: return 'Steam GCPD response handler prepared.';
 		case SyncStatus.GCPD_PARSER_INITIALIZING: return 'Preparing Steam GCPD response handler...';
+		case SyncStatus.INVALID_GCPD_RESPONSE: return 'Something went wrong (GCPD). Please make sure you\'re logged in to Steam.';
 		case SyncStatus.LEETIFY_AUTH_FAILED: return 'Could not authenticate with Leetify. Please make sure you\'re logged in.';
 		case SyncStatus.LEETIFY_AUTH_SUCCESSFUL: return 'Logged in to Leetify.';
 		case SyncStatus.REQUESTING_GCPD_PAGE: return `Requesting matches from Steam... (Iteration ${data.depth} of up to 16)`;
+		case SyncStatus.STEAM_AUTH_FAILED: return 'Could not authenticate with Steam. Please make sure you\'re logged in.';
 		case SyncStatus.UPLOADING_TO_LEETIFY_FAILED: return 'Could not upload matches to Leetify :(';
 		case SyncStatus.UPLOADING_TO_LEETIFY: return 'Uploading matches to Leetify...';
 		case SyncStatus.WAITING_FOR_LEETIFY_AUTH: return 'Logging in to Leetify...';

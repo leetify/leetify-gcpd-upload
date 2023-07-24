@@ -1,5 +1,5 @@
 import { defer } from './helpers/defer';
-import { EventName, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
+import { EventName, GcpdError, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
 import { GcpdMatch, isLeetifyAccessTokenEventBody, isRuntimeMessage, SyncStatusEventBody } from '../types/interfaces';
 import { SyncForegroundTab } from './sync-foreground-tab';
 import { Gcpd } from './gcpd';
@@ -51,9 +51,8 @@ class MatchSync {
 
 			await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZED });
 
-			await this.syncAllMatches(leetifyAccessToken);
-
-			await this.setStatus({ status: SyncStatus.DONE });
+			const syncSuccessful = await this.syncAllMatches(leetifyAccessToken);
+			if (syncSuccessful) await this.setStatus({ status: SyncStatus.DONE });
 		} finally {
 			this.leetifyAccessTokenPromise = null;
 			await chrome.offscreen.closeDocument().catch(() => {});
@@ -74,20 +73,42 @@ class MatchSync {
 		}
 	}
 
-	protected async syncAllMatches(leetifyAccessToken: string): Promise<void> {
-		await this.syncMatches(GcpdTab.SCRIMMAGE, leetifyAccessToken);
-		await this.syncMatches(GcpdTab.WINGMAN, leetifyAccessToken);
+	protected async syncAllMatches(leetifyAccessToken: string): Promise<boolean> {
+		const scrimmageSuccessful = await this.syncMatches(GcpdTab.SCRIMMAGE, leetifyAccessToken);
+		if (!scrimmageSuccessful) return false;
+		const wingmanSuccessful = await this.syncMatches(GcpdTab.WINGMAN, leetifyAccessToken);
+		if (!wingmanSuccessful) return false;
+
+		return true;
 	}
 
-	protected async syncMatches(tab: GcpdTab, leetifyAccessToken: string): Promise<void> {
+	protected async syncMatches(tab: GcpdTab, leetifyAccessToken: string): Promise<boolean> {
 		const shouldSync = await this.shouldSync(tab);
-		if (!shouldSync) return;
+		if (!shouldSync) return true;
 
 		await this.setStatus({ tab, status: SyncStatus.BEGINNING_SYNC });
 
-		const matches = this.filterMatches(await Gcpd.fetchAllMatches(tab), shouldSync);
+		const gcpdResponse = await Gcpd.fetchAllMatches(tab);
+
+		if (typeof gcpdResponse === 'string') {
+			switch (gcpdResponse) {
+				case GcpdError.INVALID_RESPONSE: {
+					await this.setStatus({ status: SyncStatus.INVALID_GCPD_RESPONSE });
+					break;
+				}
+
+				case GcpdError.STEAM_AUTH_FAILED: {
+					await this.setStatus({ status: SyncStatus.STEAM_AUTH_FAILED });
+					break;
+				}
+			}
+
+			return false;
+		}
+
+		const matches = this.filterMatches(gcpdResponse, shouldSync);
 		await this.setStatus({ status: SyncStatus.FINISHED_GCPD, found: matches.length });
-		if (!matches.length) return;
+		if (!matches.length) return true;
 
 		await this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY });
 
@@ -107,13 +128,18 @@ class MatchSync {
 			},
 		});
 
-		if (response.status !== 204) return this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED });
+		if (response.status !== 204) {
+			await this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED });
+			return false;
+		}
 
 		await chrome.storage.sync.set({
 			[syncStorageKey(tab)]: matches[0].timestamp,
 		});
 
 		await this.setStatus({ tab, status: SyncStatus.FINISHED_SYNC });
+
+		return true;
 	}
 
 	protected filterMatches(matches: GcpdMatch[], shouldSync: boolean | 'ranked_only' | 'unranked_only'): GcpdMatch[] {

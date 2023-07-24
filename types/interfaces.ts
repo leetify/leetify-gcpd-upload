@@ -84,7 +84,7 @@ export const isOptionUpdatedEventBody = (v: any): v is OptionUpdatedEventBody =>
 	&& typeof v.value === 'boolean';
 
 export type SyncStatusEventBody = {
-	status: SyncStatus.DONE | SyncStatus.GCPD_PARSER_INITIALIZED | SyncStatus.GCPD_PARSER_INITIALIZING | SyncStatus.LEETIFY_AUTH_FAILED | SyncStatus.LEETIFY_AUTH_SUCCESSFUL | SyncStatus.UPLOADING_TO_LEETIFY | SyncStatus.UPLOADING_TO_LEETIFY_FAILED | SyncStatus.WAITING_FOR_LEETIFY_AUTH;
+	status: SyncStatus.DONE | SyncStatus.GCPD_PARSER_INITIALIZED | SyncStatus.GCPD_PARSER_INITIALIZING | SyncStatus.INVALID_GCPD_RESPONSE | SyncStatus.LEETIFY_AUTH_FAILED | SyncStatus.LEETIFY_AUTH_SUCCESSFUL | SyncStatus.STEAM_AUTH_FAILED | SyncStatus.UPLOADING_TO_LEETIFY | SyncStatus.UPLOADING_TO_LEETIFY_FAILED | SyncStatus.WAITING_FOR_LEETIFY_AUTH
 } | {
 	depth: number;
 	status: SyncStatus.REQUESTING_GCPD_PAGE;
@@ -102,7 +102,7 @@ export type SyncStatusEventBody = {
 export const isSyncStatusEventBody = (v: any): v is SyncStatusEventBody => typeof v === 'object'
 	&& v.hasOwnProperty('status')
 	&& (
-		[SyncStatus.DONE, SyncStatus.GCPD_PARSER_INITIALIZED, SyncStatus.GCPD_PARSER_INITIALIZING, SyncStatus.LEETIFY_AUTH_FAILED, SyncStatus.LEETIFY_AUTH_SUCCESSFUL, SyncStatus.UPLOADING_TO_LEETIFY, SyncStatus.UPLOADING_TO_LEETIFY_FAILED, SyncStatus.WAITING_FOR_LEETIFY_AUTH].includes(v.status)
+		[SyncStatus.DONE, SyncStatus.GCPD_PARSER_INITIALIZED, SyncStatus.GCPD_PARSER_INITIALIZING, SyncStatus.INVALID_GCPD_RESPONSE, SyncStatus.LEETIFY_AUTH_FAILED, SyncStatus.LEETIFY_AUTH_SUCCESSFUL, SyncStatus.STEAM_AUTH_FAILED, SyncStatus.UPLOADING_TO_LEETIFY, SyncStatus.UPLOADING_TO_LEETIFY_FAILED, SyncStatus.WAITING_FOR_LEETIFY_AUTH].includes(v.status)
 		|| (
 			v.status === SyncStatus.REQUESTING_GCPD_PAGE
 			&& v.hasOwnProperty('depth')

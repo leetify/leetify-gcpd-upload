@@ -17,6 +17,11 @@ export enum EventName {
 	SYNC_STATUS = 'sync_status',
 }
 
+export enum GcpdError {
+	INVALID_RESPONSE = 'invalid_response',
+	STEAM_AUTH_FAILED = 'steam_auth_failed',
+}
+
 export enum SyncStatus {
 	WAITING_FOR_LEETIFY_AUTH = 'waiting_for_leetify_auth',
 	LEETIFY_AUTH_FAILED = 'leetify_auth_failed',
@@ -25,6 +30,8 @@ export enum SyncStatus {
 	GCPD_PARSER_INITIALIZED = 'gcpd_parser_initialized',
 	BEGINNING_SYNC = 'beginning_sync',
 	REQUESTING_GCPD_PAGE = 'requesting_gcpd_page',
+	INVALID_GCPD_RESPONSE = 'invalid_gcpd_response',
+	STEAM_AUTH_FAILED = 'steam_auth_failed',
 	FINISHED_GCPD = 'finished_gcpd',
 	UPLOADING_TO_LEETIFY = 'uploading_to_leetify',
 	UPLOADING_TO_LEETIFY_FAILED = 'uploading_to_leetify_failed',
