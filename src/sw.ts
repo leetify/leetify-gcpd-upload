@@ -6,8 +6,13 @@ import { SyncForegroundTab } from './sync-foreground-tab';
 import { stripFrameOptionsHeadersFromLeetifyRequests } from './helpers/strip-frame-options-headers-from-leetify-requests';
 
 const onStartupOrInstalled = async (): Promise<void> => {
-	await BackgroundSync.setAlarm();
+	// TODO make sure this doesn't cause duplicates
 	await stripFrameOptionsHeadersFromLeetifyRequests();
+
+	// TODO make sure this doesn't cause duplicates
+	if (await BackgroundSync.shouldRunOnInterval()) {
+		await BackgroundSync.setAlarm();
+	}
 };
 
 chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
@@ -29,8 +34,8 @@ const handleOptionUpdated = async (data: Record<string, any>): Promise<void> => 
 
 	switch (data.key) {
 		case SyncStorageKey.OPTION_SYNC_ON_INTERVAL: {
-			// TODO clear or set alarm
-			break;
+			if (data.value) return BackgroundSync.setAlarm();
+			return BackgroundSync.unsetAlarm();
 		}
 
 		case SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD: {

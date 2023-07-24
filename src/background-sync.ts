@@ -1,5 +1,6 @@
-import { AlarmName } from '../types/enums';
+import { AlarmName, SyncStorageKey } from '../types/enums';
 import { MatchSync } from './match-sync';
+import { getOptionDefaults } from './constants';
 
 class BackgroundSync {
 	public async setAlarm(): Promise<void> {
@@ -15,6 +16,12 @@ class BackgroundSync {
 
 	public async handleAlarm(): Promise<void> {
 		await MatchSync.run();
+	}
+
+	public async shouldRunOnInterval(): Promise<boolean> {
+		const { [SyncStorageKey.OPTION_SYNC_ON_INTERVAL]: shouldRun } = await chrome.storage.sync.get(SyncStorageKey.OPTION_SYNC_ON_INTERVAL);
+
+		return shouldRun ?? getOptionDefaults()[SyncStorageKey.OPTION_SYNC_ON_INTERVAL];
 	}
 }
 
