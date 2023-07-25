@@ -60,7 +60,11 @@ class MatchSync {
 	}
 
 	public async setStatus(eventBody: SyncStatusEventBody): Promise<void> {
-		this.lastStatusEventBody = eventBody;
+		if (eventBody.status === SyncStatus.DONE) {
+			this.lastStatusEventBody = { status: SyncStatus.IDLE };
+		} else {
+			this.lastStatusEventBody = eventBody;
+		}
 
 		await this.setActionBadge(eventBody.status);
 

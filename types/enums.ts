@@ -23,6 +23,7 @@ export enum GcpdError {
 }
 
 export enum SyncStatus {
+	IDLE = 'idle',
 	WAITING_FOR_LEETIFY_AUTH = 'waiting_for_leetify_auth',
 	LEETIFY_AUTH_FAILED = 'leetify_auth_failed',
 	LEETIFY_AUTH_SUCCESSFUL = 'leetify_auth_successful',
