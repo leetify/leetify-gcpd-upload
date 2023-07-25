@@ -22,6 +22,11 @@ export enum GcpdError {
 	STEAM_AUTH_FAILED = 'steam_auth_failed',
 }
 
+export enum GcpdTab {
+	SCRIMMAGE = 'matchhistoryscrimmage',
+	WINGMAN = 'matchhistorywingman',
+}
+
 export enum StatusIcon {
 	ALERT_CIRCLE = 'alert-circle',
 	CHECK = 'check',
@@ -45,11 +50,6 @@ export enum SyncStatus {
 	UPLOADING_TO_LEETIFY_FAILED = 'uploading_to_leetify_failed',
 	FINISHED_SYNC = 'finished_sync',
 	DONE = 'done',
-}
-
-export enum GcpdTab {
-	SCRIMMAGE = 'matchhistoryscrimmage',
-	WINGMAN = 'matchhistorywingman',
 }
 
 export enum SyncStorageKey {
