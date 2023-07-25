@@ -1,25 +1,7 @@
 import { EventName, GcpdError, GcpdTab, SyncStatus } from '../types/enums';
-import { GcpdMatch, isParseSteamGcpdEventResponseBody } from '../types/interfaces';
+import { GcpdMatch, isParseSteamGcpdEventResponseBody, isSteamGcpdResponse } from '../types/interfaces';
 import { LeetifyMatchUploader } from './leetify-match-uploader';
 import { MatchSync } from './match-sync';
-
-interface SteamGcpdResponse {
-	continue_text: string;
-	continue_token: string;
-	html: string;
-	success: true;
-}
-
-const isSteamGcpdResponse = (v: any): v is SteamGcpdResponse => typeof v === 'object'
-	&& v.hasOwnProperty('continue_text')
-	&& typeof v.continue_text === 'string'
-	&& v.hasOwnProperty('continue_token')
-	&& typeof v.continue_token === 'string'
-	&& v.hasOwnProperty('html')
-	&& typeof v.html === 'string'
-	&& v.hasOwnProperty('success')
-	&& typeof v.success === 'boolean'
-	&& v.success === true;
 
 class Gcpd {
 	public async fetchAllMatches(tab: GcpdTab): Promise<GcpdMatch[] | GcpdError> {

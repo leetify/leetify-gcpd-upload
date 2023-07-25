@@ -22,6 +22,13 @@ export enum GcpdError {
 	STEAM_AUTH_FAILED = 'steam_auth_failed',
 }
 
+export enum StatusIcon {
+	ALERT_CIRCLE = 'alert-circle',
+	CHECK = 'check',
+	DOTS_HORIZONTAL = 'dots-horizontal',
+	SPINNER = 'spinner',
+}
+
 export enum SyncStatus {
 	IDLE = 'idle',
 	WAITING_FOR_LEETIFY_AUTH = 'waiting_for_leetify_auth',

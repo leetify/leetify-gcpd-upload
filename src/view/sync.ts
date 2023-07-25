@@ -1,12 +1,5 @@
-import { EventName, GcpdTab, SyncStatus } from '../../types/enums';
+import { EventName, GcpdTab, StatusIcon, SyncStatus } from '../../types/enums';
 import { isRuntimeMessage, isSyncStatusEventBody, SyncStatusEventBody } from '../../types/interfaces';
-
-enum StatusIcon {
-	ALERT_CIRCLE = 'alert-circle',
-	CHECK = 'check',
-	DOTS_HORIZONTAL = 'dots-horizontal',
-	SPINNER = 'spinner',
-}
 
 export class Sync {
 	protected readonly statusIconElement = document.querySelector('#status-icon') as HTMLImageElement | null;

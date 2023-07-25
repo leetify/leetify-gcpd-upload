@@ -124,3 +124,21 @@ export const isSyncStatusEventBody = (v: any): v is SyncStatusEventBody => typeo
 			&& Object.values(GcpdTab).includes(v.tab)
 		)
 	);
+
+export interface SteamGcpdResponse {
+	continue_text: string;
+	continue_token: string;
+	html: string;
+	success: true;
+}
+
+export const isSteamGcpdResponse = (v: any): v is SteamGcpdResponse => typeof v === 'object'
+	&& v.hasOwnProperty('continue_text')
+	&& typeof v.continue_text === 'string'
+	&& v.hasOwnProperty('continue_token')
+	&& typeof v.continue_token === 'string'
+	&& v.hasOwnProperty('html')
+	&& typeof v.html === 'string'
+	&& v.hasOwnProperty('success')
+	&& typeof v.success === 'boolean'
+	&& v.success === true;

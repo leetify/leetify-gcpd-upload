@@ -32,7 +32,7 @@ class Action {
 
 			default:
 				await chrome.action.setBadgeText({ text: '' });
-				return;
+
 		}
 	}
 }
