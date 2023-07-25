@@ -184,8 +184,6 @@ class MatchSync {
 
 	protected setupListeners(): void {
 		chrome.runtime.onMessage.addListener((message, sender): any => {
-			console.log('from match sync', message);
-
 			if (sender.id !== chrome.runtime.id) return; // message was not sent from our extension
 			if (!isRuntimeMessage(message)) return;
 
