@@ -1,10 +1,11 @@
+import { Action } from './action';
 import { AlarmName, EventName, SyncStorageKey } from '../types/enums';
-import { isOptionUpdatedEventBody, isRuntimeMessage } from '../types/interfaces';
 import { BackgroundSync } from './background-sync';
+import { isOptionUpdatedEventBody, isRuntimeMessage } from '../types/interfaces';
+import { LeetifyAccessToken } from './leetify-access-token';
 import { MatchSync } from './match-sync';
-import { ViewTab } from './view-tab';
-import { SyncOnPageVisit } from './sync-on-page-visit';
 import { stripFrameOptionsHeadersFromLeetifyRequests } from './helpers/strip-frame-options-headers-from-leetify-requests';
+import { SyncOnPageVisit } from './sync-on-page-visit';
 
 const onStartupOrInstalled = async (): Promise<void> => {
 	// TODO make sure this doesn't cause duplicates
@@ -20,10 +21,7 @@ const onStartupOrInstalled = async (): Promise<void> => {
 chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
 chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
 
-chrome.action.onClicked.addListener(async (): Promise<void> => {
-	await ViewTab.openOrFocus();
-	await MatchSync.run();
-});
+chrome.action.onClicked.addListener(() => Action.handleClick());
 
 chrome.alarms.onAlarm.addListener(async (alarm): Promise<void> => {
 	switch (alarm.name) {
@@ -64,16 +62,14 @@ const handleOptionUpdated = async (data: Record<string, any>): Promise<void> => 
 	}
 };
 
-const handleRequestMatchSync = async (): Promise<void> => {
-	await MatchSync.run();
-};
-
 chrome.runtime.onMessage.addListener((message, sender): any => {
 	if (sender.id !== chrome.runtime.id) return;
 	if (!isRuntimeMessage(message)) return;
 
 	switch (message.event) {
+		case EventName.LEETIFY_ACCESS_TOKEN: return LeetifyAccessToken.handleLeetifyAccessTokenEvent(message.data);
 		case EventName.OPTION_UPDATED: return handleOptionUpdated(message.data);
-		case EventName.REQUEST_MATCH_SYNC: return handleRequestMatchSync();
+		case EventName.REQUEST_MATCH_SYNC: return MatchSync.handleRequestMatchSyncEvent();
+		case EventName.REQUEST_SYNC_STATUS: return MatchSync.handleRequestSyncStatusEvent();
 	}
 });

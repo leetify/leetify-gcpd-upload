@@ -1,18 +1,14 @@
-import { defer } from './helpers/defer';
+import { Action } from './action';
 import { EventName, GcpdError, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
-import { GcpdMatch, isLeetifyAccessTokenEventBody, isRuntimeMessage, SyncStatusEventBody } from '../types/interfaces';
 import { Gcpd } from './gcpd';
-import { syncStorageKey } from './helpers/sync-storage-key';
+import { GcpdMatch, SyncStatusEventBody } from '../types/interfaces';
 import { getOptionDefaults } from './constants';
+import { LeetifyAccessToken } from './leetify-access-token';
+import { LeetifyMatchUploader } from './leetify-match-uploader';
 
 class MatchSync {
 	protected inProgress = false;
 	protected lastStatusEventBody: SyncStatusEventBody = { status: SyncStatus.WAITING_FOR_LEETIFY_AUTH };
-	protected leetifyAccessTokenPromise: ReturnType<typeof defer<string | null>> | null = null;
-
-	public constructor() {
-		this.setupListeners();
-	}
 
 	public async run(): Promise<void> {
 		if (this.inProgress) return;
@@ -21,42 +17,31 @@ class MatchSync {
 		try {
 			await this.setStatus({ status: SyncStatus.WAITING_FOR_LEETIFY_AUTH });
 
-			this.leetifyAccessTokenPromise = defer<string | null>();
-
-			chrome.offscreen.createDocument({
-				justification: 'Authenticate with Leetify',
-				reasons: ['IFRAME_SCRIPTING'],
-				url: 'src/offscreen/leetify-auth.html',
-			}).catch((err) => {
-				// TODO this is not great: Chrome never considers the offscreen page to have finished loading for some reason, so we just have it close itself when it's done -- that throws this error, which we don't care about
-				if (err && err.message === 'Offscreen document closed before fully loading.') return;
-				throw err;
-			});
-
-			const leetifyAccessToken = await this.leetifyAccessTokenPromise;
-			this.leetifyAccessTokenPromise = null;
-			await chrome.offscreen.closeDocument();
-
+			const leetifyAccessToken = await LeetifyAccessToken.get();
 			if (!leetifyAccessToken) return await this.setStatus({ status: SyncStatus.LEETIFY_AUTH_FAILED });
 
 			await this.setStatus({ status: SyncStatus.LEETIFY_AUTH_SUCCESSFUL });
-			await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZING });
-
-			await chrome.offscreen.createDocument({
-				justification: 'Parse Steam GCPD page',
-				reasons: ['DOM_PARSER'],
-				url: 'src/offscreen/dom-parser.html',
-			});
-
-			await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZED });
+			await this.initDomParser();
 
 			const syncSuccessful = await this.syncAllMatches(leetifyAccessToken);
 			if (syncSuccessful) await this.setStatus({ status: SyncStatus.DONE });
 		} finally {
-			this.leetifyAccessTokenPromise = null;
+			LeetifyAccessToken.clearPromise();
 			await chrome.offscreen.closeDocument().catch(() => {});
 			this.inProgress = false;
 		}
+	}
+
+	protected async initDomParser(): Promise<void> {
+		await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZING });
+
+		await chrome.offscreen.createDocument({
+			justification: 'Parse Steam GCPD page',
+			reasons: ['DOM_PARSER'],
+			url: 'src/offscreen/dom-parser.html',
+		});
+
+		await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZED });
 	}
 
 	public async setStatus(eventBody: SyncStatusEventBody): Promise<void> {
@@ -66,7 +51,7 @@ class MatchSync {
 			this.lastStatusEventBody = eventBody;
 		}
 
-		await this.setActionBadge(eventBody.status);
+		await Action.setBadgeFromSyncStatus(eventBody.status);
 
 		// TODO it seems like there's currently no good way to find all tabs "owned" by this extension, so for now, we'll just always try to send a status message
 		// if (!await ViewTab.exists()) return;
@@ -79,9 +64,18 @@ class MatchSync {
 		}
 	}
 
+	public handleRequestMatchSyncEvent(): Promise<void> {
+		return this.run();
+	}
+
+	public async handleRequestSyncStatusEvent(): Promise<void> {
+		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: this.lastStatusEventBody });
+	}
+
 	protected async syncAllMatches(leetifyAccessToken: string): Promise<boolean> {
 		const scrimmageSuccessful = await this.syncMatches(GcpdTab.SCRIMMAGE, leetifyAccessToken);
 		if (!scrimmageSuccessful) return false;
+
 		const wingmanSuccessful = await this.syncMatches(GcpdTab.WINGMAN, leetifyAccessToken);
 		if (!wingmanSuccessful) return false;
 
@@ -95,57 +89,13 @@ class MatchSync {
 		await this.setStatus({ tab, status: SyncStatus.BEGINNING_SYNC });
 
 		const gcpdResponse = await Gcpd.fetchAllMatches(tab);
-
-		if (typeof gcpdResponse === 'string') {
-			switch (gcpdResponse) {
-				case GcpdError.INVALID_RESPONSE: {
-					await this.setStatus({ status: SyncStatus.INVALID_GCPD_RESPONSE });
-					break;
-				}
-
-				case GcpdError.STEAM_AUTH_FAILED: {
-					await this.setStatus({ status: SyncStatus.STEAM_AUTH_FAILED });
-					break;
-				}
-			}
-
-			return false;
-		}
+		if (typeof gcpdResponse === 'string') return this.handleGcpdError(gcpdResponse);
 
 		const matches = this.filterMatches(gcpdResponse, shouldSync);
 		await this.setStatus({ status: SyncStatus.FINISHED_GCPD, found: matches.length });
 		if (!matches.length) return true;
 
-		await this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY });
-
-		const response = await fetch('https://api.leetify.test/api/upload-from-url', { // TODO
-			method: 'POST',
-
-			body: JSON.stringify({
-				matches: matches.map((match) => ({
-					url: match.url,
-					timestamp: match.timestamp,
-				})),
-			}),
-
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${leetifyAccessToken}`,
-			},
-		});
-
-		if (response.status !== 204) {
-			await this.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY_FAILED });
-			return false;
-		}
-
-		await chrome.storage.sync.set({
-			[syncStorageKey(tab)]: matches[0].timestamp,
-		});
-
-		await this.setStatus({ tab, status: SyncStatus.FINISHED_SYNC });
-
-		return true;
+		return LeetifyMatchUploader.uploadMatches(matches, tab, leetifyAccessToken);
 	}
 
 	protected filterMatches(matches: GcpdMatch[], shouldSync: boolean | 'ranked_only' | 'unranked_only'): GcpdMatch[] {
@@ -182,51 +132,20 @@ class MatchSync {
 		}
 	}
 
-	protected setupListeners(): void {
-		chrome.runtime.onMessage.addListener((message, sender): any => {
-			if (sender.id !== chrome.runtime.id) return; // message was not sent from our extension
-			if (!isRuntimeMessage(message)) return;
-
-			switch (message.event) {
-				case EventName.LEETIFY_ACCESS_TOKEN: return this.handleLeetifyAccessToken(message.data);
-				case EventName.REQUEST_SYNC_STATUS: return this.handleRequestSyncStatus();
+	protected async handleGcpdError(gcpdError: GcpdError): Promise<false> {
+		switch (gcpdError) {
+			case GcpdError.INVALID_RESPONSE: {
+				await this.setStatus({ status: SyncStatus.INVALID_GCPD_RESPONSE });
+				break;
 			}
-		});
-	}
 
-	protected handleLeetifyAccessToken(data: Record<string, any>): void {
-		if (!isLeetifyAccessTokenEventBody(data)) return;
-
-		if (this.leetifyAccessTokenPromise) {
-			this.leetifyAccessTokenPromise.resolve(data.accessToken);
+			case GcpdError.STEAM_AUTH_FAILED: {
+				await this.setStatus({ status: SyncStatus.STEAM_AUTH_FAILED });
+				break;
+			}
 		}
-	}
 
-	protected async handleRequestSyncStatus(): Promise<void> {
-		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: this.lastStatusEventBody });
-	}
-
-	protected setActionBadge(syncStatus: SyncStatus): Promise<unknown> {
-		switch (syncStatus) {
-			case SyncStatus.LEETIFY_AUTH_FAILED:
-			case SyncStatus.STEAM_AUTH_FAILED:
-				return Promise.all([
-					chrome.action.setBadgeBackgroundColor({ color: '#de425b' }),
-					chrome.action.setBadgeText({ text: 'ERR' }),
-					chrome.action.setBadgeTextColor({ color: '#000' }),
-				]);
-
-			case SyncStatus.INVALID_GCPD_RESPONSE:
-			case SyncStatus.UPLOADING_TO_LEETIFY_FAILED:
-				return Promise.all([
-					chrome.action.setBadgeBackgroundColor({ color: '#fb9d5a' }),
-					chrome.action.setBadgeText({ text: 'fail' }),
-					chrome.action.setBadgeTextColor({ color: '#000' }),
-				]);
-
-			default:
-				return chrome.action.setBadgeText({ text: '' });
-		}
+		return false;
 	}
 }
 

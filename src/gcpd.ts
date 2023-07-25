@@ -1,6 +1,6 @@
-import { GcpdMatch, isParseSteamGcpdEventResponseBody } from '../types/interfaces';
 import { EventName, GcpdError, GcpdTab, SyncStatus } from '../types/enums';
-import { syncStorageKey } from './helpers/sync-storage-key';
+import { GcpdMatch, isParseSteamGcpdEventResponseBody } from '../types/interfaces';
+import { LeetifyMatchUploader } from './leetify-match-uploader';
 import { MatchSync } from './match-sync';
 
 interface SteamGcpdResponse {
@@ -23,8 +23,7 @@ const isSteamGcpdResponse = (v: any): v is SteamGcpdResponse => typeof v === 'ob
 
 class Gcpd {
 	public async fetchAllMatches(tab: GcpdTab): Promise<GcpdMatch[] | GcpdError> {
-		const previouslyFoundMatchTimestampKey = syncStorageKey(tab);
-		const { [previouslyFoundMatchTimestampKey]: previouslyFoundMatchTimestamp } = await chrome.storage.sync.get(previouslyFoundMatchTimestampKey);
+		const previouslyFoundMatchTimestamp = await LeetifyMatchUploader.getPreviouslyFoundMatchTimestamp(tab);
 
 		return this.fetchMatchesRecursively({ tab, previouslyFoundMatchTimestamp, matches: [] });
 	}
