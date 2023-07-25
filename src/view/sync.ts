@@ -35,7 +35,6 @@ const getStatusIcon = (data: SyncStatusEventBody): StatusIcon => {
 const getStatusMessage = (data: SyncStatusEventBody): string => {
 	switch (data.status) {
 		case SyncStatus.BEGINNING_SYNC: return `Requesting matches from Steam... (${data.tab === GcpdTab.WINGMAN ? 'Wingman' : 'Unranked 5v5'})`;
-		case SyncStatus.DONE: return 'Done.';
 		case SyncStatus.FINISHED_GCPD: return `Received ${data.found === 1 ? 'one match' : `${data.found} matches`} from Steam.`;
 		case SyncStatus.FINISHED_SYNC: return `Synchronized ${data.tab === GcpdTab.WINGMAN ? 'Wingman' : 'Unranked 5v5'} matches.`;
 		case SyncStatus.GCPD_PARSER_INITIALIZED: return 'Steam GCPD response handler prepared.';
@@ -49,6 +48,12 @@ const getStatusMessage = (data: SyncStatusEventBody): string => {
 		case SyncStatus.UPLOADING_TO_LEETIFY_FAILED: return 'Could not upload matches to Leetify :(';
 		case SyncStatus.UPLOADING_TO_LEETIFY: return 'Uploading matches to Leetify...';
 		case SyncStatus.WAITING_FOR_LEETIFY_AUTH: return 'Logging in to Leetify...';
+
+		case SyncStatus.DONE: {
+			const now = new Date();
+			const f = (n: number): string => n.toString().padStart(2, '0');
+			return `Done at ${f(now.getHours())}:${f(now.getMinutes())}:${f(now.getSeconds())}.`;
+		}
 	}
 };
 
