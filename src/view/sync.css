@@ -30,10 +30,13 @@ section.sync button {
 	font-family: inherit;
 	font-weight: 600;
 	line-height: inherit;
-	transition: background-color 0.2s ease;
+	transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-section.sync button:active,
+section.sync button:active {
+	transform: scale(0.975);
+}
+
 section.sync button:hover {
 	background-color: var(--leetify-pink-hover);
 }
