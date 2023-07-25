@@ -1,5 +1,5 @@
-import { initOptions } from './options';
-import { initSync } from './sync';
+import { Options } from './options';
+import { Sync } from './sync';
 
-initOptions();
-initSync();
+new Options();
+new Sync();

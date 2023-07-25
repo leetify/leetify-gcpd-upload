@@ -6,8 +6,8 @@ interface Option {
 	label: string;
 }
 
-export const initOptions = async () => {
-	const options: Option[] = [
+export class Options {
+	protected static readonly OPTIONS: Option[] = [
 		{
 			key: SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN,
 			label: 'Sync unranked Wingman matches',
@@ -39,34 +39,46 @@ export const initOptions = async () => {
 		},
 	];
 
-	const checkboxContainer = document.querySelector('div#checkbox-container') as HTMLDivElement;
+	protected readonly checkboxContainer = document.querySelector('div#checkbox-container') as HTMLDivElement | null;
 
-	const values = Object.assign(
-		getOptionDefaults(),
-		await chrome.storage.sync.get(options.map(({ key }) => key)),
-	);
-
-	for (const option of options) {
-		const checkbox = document.createElement('input');
-		checkbox.id = `option-${option.key}`;
-		checkbox.type = 'checkbox';
-		checkbox.checked = !!values[option.key];
-
-		// eslint-disable-next-line no-loop-func
-		checkbox.addEventListener('change', async () => {
-			await chrome.storage.sync.set({ [option.key]: checkbox.checked });
-
-			await chrome.runtime.sendMessage({
-				event: EventName.OPTION_UPDATED,
-				data: { key: option.key, value: checkbox.checked },
-			});
-		});
-
-		const label = document.createElement('label');
-		label.innerText = option.label;
-		label.setAttribute('for', checkbox.id);
-
-		checkboxContainer.appendChild(checkbox);
-		checkboxContainer.appendChild(label);
+	public constructor() {
+		this.initCheckboxes();
 	}
-};
+
+	protected async initCheckboxes(): Promise<void> {
+		if (!this.checkboxContainer) return;
+
+		const values = await this.getValues();
+
+		for (const option of Options.OPTIONS) {
+			const checkbox = document.createElement('input');
+			checkbox.id = `option-${option.key}`;
+			checkbox.type = 'checkbox';
+			checkbox.checked = !!values[option.key];
+
+			// eslint-disable-next-line no-loop-func
+			checkbox.addEventListener('change', async () => {
+				await chrome.storage.sync.set({ [option.key]: checkbox.checked });
+
+				await chrome.runtime.sendMessage({
+					event: EventName.OPTION_UPDATED,
+					data: { key: option.key, value: checkbox.checked },
+				});
+			});
+
+			const label = document.createElement('label');
+			label.innerText = option.label;
+			label.setAttribute('for', checkbox.id);
+
+			this.checkboxContainer.appendChild(checkbox);
+			this.checkboxContainer.appendChild(label);
+		}
+	}
+
+	protected async getValues(): Promise<{ [key in SyncStorageKey]?: boolean }> {
+		return {
+			...getOptionDefaults(),
+			...await chrome.storage.sync.get(Options.OPTIONS.map(({ key }) => key)),
+		};
+	}
+}

@@ -1,6 +1,5 @@
 import { DeclarativeNetRequestRuleId } from '../../types/enums';
 
-// TODO make sure this only applies within the extension
 export const stripFrameOptionsHeadersFromLeetifyRequests = async (): Promise<void> => {
 	const rule: chrome.declarativeNetRequest.Rule = {
 		id: DeclarativeNetRequestRuleId.STRIP_FRAME_OPTIONS_HEADERS_FROM_LEETIFY_REQUESTS,
