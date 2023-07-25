@@ -21,8 +21,8 @@ chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
 chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
 
 chrome.action.onClicked.addListener(async (): Promise<void> => {
-	await MatchSync.run();
 	await ViewTab.openOrFocus();
+	await MatchSync.run();
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm): Promise<void> => {
