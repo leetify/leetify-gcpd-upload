@@ -19,3 +19,7 @@ body {
 	color: var(--text-color);
 	font: 1.6rem/1.5 'Poppins', system-ui, ui-sans-serif, 'Ubuntu', 'Open Sans', 'Segoe UI Variable', 'Segoe UI', 'Roboto', 'Calibri', 'Helvetica Neue', 'Arial', sans-serif;
 }
+
+label {
+	display: block;
+}

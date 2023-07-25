@@ -1,9 +1,6 @@
 import { EventName, GcpdTab, SyncStatus } from '../../types/enums';
 import { isRuntimeMessage, isSyncStatusEventBody, SyncStatusEventBody } from '../../types/interfaces';
 
-const triggerSyncButton = document.querySelector('button#trigger-sync');
-if (triggerSyncButton) triggerSyncButton.addEventListener('click', () => chrome.runtime.sendMessage({ event: EventName.REQUEST_MATCH_SYNC }));
-
 const getFriendlyStatus = (data: SyncStatusEventBody): string => {
 	switch (data.status) {
 		case SyncStatus.BEGINNING_SYNC: return `Requesting matches from Steam... (${data.tab === GcpdTab.WINGMAN ? 'Wingman' : 'Unranked 5v5'})`;
@@ -35,17 +32,20 @@ const handleSyncStatus = (data: Record<string, any>): void => {
 	friendlyStatusElement.innerText = getFriendlyStatus(data);
 };
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse): any => {
-	console.log('from sync foreground', message);
+export const initSync = (): void => {
+	const triggerSyncButton = document.querySelector('button#trigger-sync');
+	if (triggerSyncButton) triggerSyncButton.addEventListener('click', () => chrome.runtime.sendMessage({ event: EventName.REQUEST_MATCH_SYNC }));
 
-	if (sender.id !== chrome.runtime.id) return;
-	if (!isRuntimeMessage(message)) return;
+	chrome.runtime.onMessage.addListener((message, sender): any => {
+		console.log('from view tab', message);
 
-	switch (message.event) {
-		case EventName.SYNC_STATUS: return handleSyncStatus(message.data);
-	}
+		if (sender.id !== chrome.runtime.id) return;
+		if (!isRuntimeMessage(message)) return;
 
-	return false;
-});
+		switch (message.event) {
+			case EventName.SYNC_STATUS: return handleSyncStatus(message.data);
+		}
+	});
 
-chrome.runtime.sendMessage(({ event: EventName.REQUEST_SYNC_STATUS }));
+	chrome.runtime.sendMessage(({ event: EventName.REQUEST_SYNC_STATUS }));
+};

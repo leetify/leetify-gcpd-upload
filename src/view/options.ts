@@ -6,39 +6,39 @@ interface Option {
 	label: string;
 }
 
-const options: Option[] = [
-	{
-		key: SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN,
-		label: 'Sync unranked Wingman matches',
-	},
+export const initOptions = async () => {
+	const options: Option[] = [
+		{
+			key: SyncStorageKey.OPTION_SYNC_UNRANKED_WINGMAN,
+			label: 'Sync unranked Wingman matches',
+		},
 
-	{
-		key: SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN,
-		label: 'Sync ranked Wingman matches',
-	},
+		{
+			key: SyncStorageKey.OPTION_SYNC_RANKED_WINGMAN,
+			label: 'Sync ranked Wingman matches',
+		},
 
-	{
-		key: SyncStorageKey.OPTION_SYNC_UNRANKED_5V5,
-		label: 'Sync unranked 5v5 matches',
-	},
+		{
+			key: SyncStorageKey.OPTION_SYNC_UNRANKED_5V5,
+			label: 'Sync unranked 5v5 matches',
+		},
 
-	{
-		key: SyncStorageKey.OPTION_SYNC_ON_INTERVAL,
-		label: 'Sync matches every 15 minutes (when your browser is open)',
-	},
+		{
+			key: SyncStorageKey.OPTION_SYNC_ON_INTERVAL,
+			label: 'Sync matches every 15 minutes (when your browser is open)',
+		},
 
-	{
-		key: SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY,
-		label: 'Sync matches when visiting Leetify',
-	},
+		{
+			key: SyncStorageKey.OPTION_SYNC_ON_VISIT_LEETIFY,
+			label: 'Sync matches when visiting Leetify',
+		},
 
-	{
-		key: SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD,
-		label: 'Sync matches when visiting Steam GCPD',
-	},
-];
+		{
+			key: SyncStorageKey.OPTION_SYNC_ON_VISIT_GCPD,
+			label: 'Sync matches when visiting Steam GCPD',
+		},
+	];
 
-(async () => {
 	const checkboxContainer = document.querySelector('div#checkbox-container') as HTMLDivElement;
 
 	const values = Object.assign(
@@ -67,4 +67,4 @@ const options: Option[] = [
 
 		checkboxContainer.appendChild(label);
 	}
-})();
+};

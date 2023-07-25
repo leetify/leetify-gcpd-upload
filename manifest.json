@@ -4,10 +4,10 @@
 	"description": "Auto-upload Counter-Strike demos from unranked Matchmaking to Leetify",
 	"version": "0.0.1",
 	"homepage_url": "https://leetify.com",
-	"options_page": "src/options/options.html",
+	"options_page": "src/view/index.html",
 
 	"options_ui": {
-		"page": "src/options/options.html",
+		"page": "src/view/index.html",
 		"open_in_tab": true
 	},
 

@@ -1,7 +1,7 @@
 import { tabExists } from './helpers/tab-exists';
 
-class SyncForegroundTab {
-	protected static readonly URL = 'src/sync-foreground/sync-foreground.html';
+class ViewTab {
+	protected static readonly URL = 'src/view/index.html';
 
 	protected tab: chrome.tabs.Tab | null = null;
 
@@ -12,7 +12,7 @@ class SyncForegroundTab {
 		}
 
 		this.tab = await chrome.tabs.create({
-			url: SyncForegroundTab.URL,
+			url: ViewTab.URL,
 			active: true,
 		});
 	}
@@ -29,8 +29,8 @@ class SyncForegroundTab {
 	}
 }
 
-const singleton = new SyncForegroundTab();
+const singleton = new ViewTab();
 
 export {
-	singleton as SyncForegroundTab,
+	singleton as ViewTab,
 };

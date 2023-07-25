@@ -65,7 +65,7 @@ class MatchSync {
 		await this.setActionBadge(eventBody.status);
 
 		// TODO it seems like there's currently no good way to find all tabs "owned" by this extension, so for now, we'll just always try to send a status message
-		// if (!await SyncForegroundTab.exists()) return;
+		// if (!await ViewTab.exists()) return;
 
 		try {
 			await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: eventBody });

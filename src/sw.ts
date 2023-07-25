@@ -2,7 +2,7 @@ import { AlarmName, EventName, SyncStorageKey } from '../types/enums';
 import { isOptionUpdatedEventBody, isRuntimeMessage } from '../types/interfaces';
 import { BackgroundSync } from './background-sync';
 import { MatchSync } from './match-sync';
-import { SyncForegroundTab } from './sync-foreground-tab';
+import { ViewTab } from './view-tab';
 import { SyncOnPageVisit } from './sync-on-page-visit';
 import { stripFrameOptionsHeadersFromLeetifyRequests } from './helpers/strip-frame-options-headers-from-leetify-requests';
 
@@ -21,8 +21,8 @@ chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
 chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
 
 chrome.action.onClicked.addListener(async (): Promise<void> => {
-	await SyncForegroundTab.openOrFocus();
 	await MatchSync.run();
+	await ViewTab.openOrFocus();
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm): Promise<void> => {
