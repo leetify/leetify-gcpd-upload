@@ -48,6 +48,7 @@ export const initOptions = async () => {
 
 	for (const option of options) {
 		const checkbox = document.createElement('input');
+		checkbox.id = `option-${option.key}`;
 		checkbox.type = 'checkbox';
 		checkbox.checked = !!values[option.key];
 
@@ -62,9 +63,10 @@ export const initOptions = async () => {
 		});
 
 		const label = document.createElement('label');
-		label.appendChild(checkbox);
-		label.insertAdjacentText('beforeend', option.label);
+		label.innerText = option.label;
+		label.setAttribute('for', checkbox.id);
 
+		checkboxContainer.appendChild(checkbox);
 		checkboxContainer.appendChild(label);
 	}
 };

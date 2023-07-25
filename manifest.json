@@ -12,22 +12,22 @@
 	},
 
 	"icons": {
-		"16": "assets/icons/16.png",
-		"32": "assets/icons/32.png",
-		"48": "assets/icons/48.png",
-		"64": "assets/icons/64.png",
-		"128": "assets/icons/128.png",
-		"256": "assets/icons/256.png"
+		"16": "assets/logo-icons/16.png",
+		"32": "assets/logo-icons/32.png",
+		"48": "assets/logo-icons/48.png",
+		"64": "assets/logo-icons/64.png",
+		"128": "assets/logo-icons/128.png",
+		"256": "assets/logo-icons/256.png"
 	},
 
 	"action": {
 		"default_icon": {
-			"16": "assets/icons/16.png",
-			"32": "assets/icons/32.png",
-			"48": "assets/icons/48.png",
-			"64": "assets/icons/64.png",
-			"128": "assets/icons/128.png",
-			"256": "assets/icons/256.png"
+			"16": "assets/logo-icons/16.png",
+			"32": "assets/logo-icons/32.png",
+			"48": "assets/logo-icons/48.png",
+			"64": "assets/logo-icons/64.png",
+			"128": "assets/logo-icons/128.png",
+			"256": "assets/logo-icons/256.png"
 		}
 	},
 

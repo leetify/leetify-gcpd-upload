@@ -20,21 +20,18 @@ const getFriendlyStatus = (data: SyncStatusEventBody): string => {
 	}
 };
 
-const handleSyncStatus = (data: Record<string, any>): void => {
-	if (!isSyncStatusEventBody(data)) return;
-	const log = document.querySelector('#log') as HTMLElement;
-
-	const div = document.createElement('div');
-	div.innerText = `${new Date()} ${JSON.stringify(data)}`;
-	log.appendChild(div);
-
-	const friendlyStatusElement = document.querySelector('#friendly-status') as HTMLElement;
-	friendlyStatusElement.innerText = getFriendlyStatus(data);
-};
-
 export const initSync = (): void => {
 	const triggerSyncButton = document.querySelector('button#trigger-sync');
 	if (triggerSyncButton) triggerSyncButton.addEventListener('click', () => chrome.runtime.sendMessage({ event: EventName.REQUEST_MATCH_SYNC }));
+
+	const friendlyStatusElement = document.querySelector('#friendly-status') as HTMLElement;
+
+	const handleSyncStatus = (data: Record<string, any>): void => {
+		if (!isSyncStatusEventBody(data)) return;
+
+		console.info(new Date().toJSON(), '[SyncStatus]', JSON.stringify(data));
+		friendlyStatusElement.innerText = getFriendlyStatus(data);
+	};
 
 	chrome.runtime.onMessage.addListener((message, sender): any => {
 		console.log('from view tab', message);

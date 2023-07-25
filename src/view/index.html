@@ -2,31 +2,52 @@
 <html lang="en" dir="ltr">
 <head>
 	<meta charset="utf-8">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 	<title>Leetify Unranked Uploader</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="theme-color" content="#f84982">
-	<link rel="icon" type="image/svg+xml" href="/assets/icons/256.png">
-	<link rel="icon" type="image/png" href="/assets/icons/32.png" sizes="32x32">
-	<link rel="icon" type="image/png" href="/assets/icons/16.png" sizes="16x16">
+
+	<link rel="icon" type="image/svg+xml" href="/assets/logo-icons/256.png">
+	<link rel="icon" type="image/png" href="/assets/logo-icons/32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="/assets/logo-icons/16.png" sizes="16x16">
+
 	<link rel="stylesheet" href="/src/view/index.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+
 	<script src="/dist/view/index.js" async defer></script>
 </head>
 <body>
-	<h1>it works</h1>
+	<main>
+		<h1>
+			<img class="logo" src="/assets/leetify-logo-primary-white.svg" alt="Leetify">
+			Unranked Uploader
+		</h1>
 
-	<section>
-		<h2>Sync</h2>
+		<section>
+			<header>
+				<img src="/assets/icons/sync.svg" alt="">
+				<h2>Sync</h2>
+			</header>
 
-		<button id="trigger-sync">Sync matches now</button>
-		<div id="friendly-status"></div>
-		<div id="log"></div>
-	</section>
+			<div class="inner">
+				<div id="friendly-status"></div>
+				<button id="trigger-sync">Sync matches now</button>
+			</div>
+		</section>
 
-	<section>
-		<h2>Settings</h2>
+		<section>
+			<header>
+				<img src="/assets/icons/cog.svg" alt="">
+				<h2>Settings</h2>
+			</header>
 
-		<div id="checkbox-container"></div>
-		<p>You can always sync your matches manually by clicking the extension icon in the browser toolbar.</p>
-	</section>
+			<div class="inner">
+				<div id="checkbox-container"></div>
+				<p class="extension-button-info">You can always sync your matches manually by clicking the extension icon in the browser toolbar.</p>
+			</div>
+		</section>
+	</main>
 </body>
 </html>
