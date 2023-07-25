@@ -1,4 +1,5 @@
 import { DeclarativeNetRequestRuleId } from '../../types/enums';
+import { LEETIFY_FRONTEND_DOMAIN } from '../constants';
 
 export const stripFrameOptionsHeadersFromLeetifyRequests = async (): Promise<void> => {
 	const rule: chrome.declarativeNetRequest.Rule = {
@@ -6,7 +7,7 @@ export const stripFrameOptionsHeadersFromLeetifyRequests = async (): Promise<voi
 
 		condition: {
 			initiatorDomains: [chrome.runtime.id],
-			requestDomains: ['leetify.test'],
+			requestDomains: [LEETIFY_FRONTEND_DOMAIN],
 			resourceTypes: ['sub_frame'],
 		},
 

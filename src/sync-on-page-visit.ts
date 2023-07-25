@@ -1,6 +1,6 @@
-import { SyncStorageKey } from '../types/enums';
+import { getOptionDefaults, LEETIFY_FRONTEND_URL } from './constants';
 import { MatchSync } from './match-sync';
-import { getOptionDefaults } from './constants';
+import { SyncStorageKey } from '../types/enums';
 
 class SyncOnPageVisit {
 	protected lastSyncOnPageVisit: Date | null = null;
@@ -57,7 +57,7 @@ class SyncOnPageVisit {
 
 		this.lastSyncOnPageVisit = new Date();
 
-		if (/^https:\/\/leetify\.test($|\/)/.test(tab.url)) {
+		if (tab.url.startsWith(`${LEETIFY_FRONTEND_URL}/`) || tab.url === LEETIFY_FRONTEND_URL) {
 			if (await this.syncOnVisitLeetifyCachePromise) await MatchSync.run();
 		} else if (/^https:\/\/steamcommunity\.com\/(id\/[^/]+|profiles\/\d+)\/gcpd\/730/.test(tab.url)) {
 			if (await this.syncOnVisitGcpdCachePromise) await MatchSync.run();

@@ -40,7 +40,7 @@
 			"all_frames": true,
 
 			"matches": [
-				"https://leetify.test/*" // TODO
+				"https://leetify.com/*"
 			],
 
 			"js": [
@@ -58,7 +58,7 @@
 	],
 
 	"host_permissions": [
-		"https://leetify.test/*",
+		"https://leetify.com/*",
 		"https://steamcommunity.com/my/gcpd/730"
 	]
 }

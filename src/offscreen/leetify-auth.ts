@@ -1,5 +1,7 @@
+import { LEETIFY_FRONTEND_URL } from '../constants';
+
 (() => {
 	const iframe = document.createElement('iframe');
-	iframe.src = 'https://leetify.test/gcpd-extension-auth';
+	iframe.src = `${LEETIFY_FRONTEND_URL}/gcpd-extension-auth`;
 	document.body.appendChild(iframe);
 })();

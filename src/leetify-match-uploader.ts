@@ -1,12 +1,13 @@
 import { GcpdMatch } from '../types/interfaces';
 import { GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
 import { MatchSync } from './match-sync';
+import { LEETIFY_API_URL } from './constants';
 
 class LeetifyMatchUploader {
 	public async uploadMatches(matches: GcpdMatch[], tab: GcpdTab, leetifyAccessToken: string): Promise<boolean> {
 		await MatchSync.setStatus({ status: SyncStatus.UPLOADING_TO_LEETIFY });
 
-		const response = await fetch('https://api.leetify.test/api/upload-from-url', { // TODO
+		const response = await fetch(`${LEETIFY_API_URL}/api/upload-from-url`, {
 			method: 'POST',
 			body: this.buildRequestBody(matches),
 

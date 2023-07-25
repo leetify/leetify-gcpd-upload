@@ -1,7 +1,8 @@
 import { EventName } from '../../types/enums';
+import { LEETIFY_FRONTEND_URL } from '../constants';
 
 (async () => {
-	if (window.location.toString() !== 'https://leetify.test/gcpd-extension-auth') return;
+	if (window.location.toString() !== `${LEETIFY_FRONTEND_URL}/gcpd-extension-auth`) return;
 
 	document.write('');
 
