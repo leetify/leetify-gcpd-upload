@@ -4,12 +4,10 @@ import { BackgroundSync } from './background-sync';
 import { isOptionUpdatedEventBody, isRuntimeMessage } from '../types/interfaces';
 import { LeetifyAccessToken } from './leetify-access-token';
 import { MatchSync } from './match-sync';
-import { stripFrameOptionsHeadersFromLeetifyRequests } from './helpers/strip-frame-options-headers-from-leetify-requests';
 import { SyncOnPageVisit } from './sync-on-page-visit';
 
 const onStartupOrInstalled = async (): Promise<void> => {
 	// TODO make sure this doesn't cause duplicates
-	await stripFrameOptionsHeadersFromLeetifyRequests();
 	await SyncOnPageVisit.applyListener();
 
 	// TODO make sure this doesn't cause duplicates
