@@ -8,7 +8,7 @@ import { LeetifyMatchUploader } from './leetify-match-uploader';
 
 class MatchSync {
 	protected inProgress = false;
-	protected lastStatusEventBody: SyncStatusEventBody = { status: SyncStatus.WAITING_FOR_LEETIFY_AUTH };
+	protected lastStatusEventBody: SyncStatusEventBody = { status: SyncStatus.IDLE };
 
 	public async run(): Promise<void> {
 		if (this.inProgress) return;
