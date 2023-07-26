@@ -17,7 +17,14 @@ const onStartupOrInstalled = async (): Promise<void> => {
 };
 
 chrome.runtime.onStartup.addListener(() => onStartupOrInstalled());
-chrome.runtime.onInstalled.addListener(() => onStartupOrInstalled());
+
+chrome.runtime.onInstalled.addListener(async () => {
+	await Promise.all([
+		chrome.runtime.openOptionsPage(),
+		MatchSync.run(),
+		onStartupOrInstalled(),
+	]);
+});
 
 chrome.action.onClicked.addListener(() => Action.handleClick());
 
