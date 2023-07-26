@@ -1,3 +1,7 @@
+// This module is loaded as part of "the view". It instantiates the option
+// checkboxes, and handles any changes by sending them to the Service Worker
+// (which will then save the changes).
+
 import { EventName, SyncStorageKey } from '../../types/enums';
 import { getOptionDefaults } from '../constants';
 

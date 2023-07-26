@@ -1,3 +1,7 @@
+// This module handles everything related to the "action", i.e. the extension
+// icon in Chrome's toolbar. Namely, clicking on it to open the foreground page,
+// and displaying a badge when something went wrong during a sync.
+
 import { MatchSync } from './match-sync';
 import { SyncStatus } from '../types/enums';
 import { ViewTab } from './view-tab';

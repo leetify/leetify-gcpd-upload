@@ -1,3 +1,7 @@
+// This module handles syncs on page visits. Whenever the user visits either
+// Leetify or Steam GCPD, we want to run a sync (if enabled in the options,
+// and it's been a bit since the last sync).
+
 import { getOptionDefaults, LEETIFY_FRONTEND_URL } from './constants';
 import { MatchSync } from './match-sync';
 import { SyncStorageKey } from '../types/enums';

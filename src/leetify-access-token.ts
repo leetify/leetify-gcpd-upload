@@ -1,3 +1,8 @@
+// This module is the Service Worker side of getting the Leetify access token.
+// It instantiates an offscreen page (which in turn loads an iframe, which in
+// turn loads a content script), and handles the LeetifyAccessToken event sent
+// by that content script.
+
 import { defer } from './helpers/defer';
 import { isLeetifyAccessTokenEventBody } from '../types/interfaces';
 

@@ -1,3 +1,9 @@
+// This offscreen page will receive messages from the Service Worker during a
+// sync. The messages contain HTML we've received from Steam GCPD. This script
+// will parse the HTML, and extract the matches from it (namely each match's
+// timestamp, url, and whether it was ranked or not). It'll then send a
+// response to the message with all matches it found.
+
 import { EventName } from '../../types/enums';
 import { isParseSteamGcpdEventBody, isRuntimeMessage, GcpdMatch, ParseSteamGcpdEventResponseBody } from '../../types/interfaces';
 

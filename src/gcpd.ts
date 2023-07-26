@@ -1,3 +1,8 @@
+// This module interfaces with GCPD. It recursively requests the GCPD pages (in
+// normal use, they are asynchronously loaded when the user clicks a "Load more"
+// button), and sending their content to the DOM parser, which extracts the
+// match metadata from them.
+
 import { EventName, GcpdError, GcpdTab, SyncStatus } from '../types/enums';
 import { GcpdMatch, isParseSteamGcpdEventResponseBody, isSteamGcpdResponse } from '../types/interfaces';
 import { LeetifyMatchUploader } from './leetify-match-uploader';

@@ -1,3 +1,9 @@
+// This module is the main code for running a sync. It asks for the Leetify
+// access token, initializes the DOM parser, then asks for matches from GCPD,
+// and finally sends the found matches to Leetify.
+// It's also responsible for sending the current status to the foreground view,
+// if it's active.
+
 import { Action } from './action';
 import { EventName, GcpdError, GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
 import { Gcpd } from './gcpd';

@@ -1,3 +1,7 @@
+// This module sends matches to Leetify's API. It also retrieves and updates
+// the timestamp of the last match we found (saved locally to avoid sending the
+// same match to Leetify multiple times).
+
 import { GcpdMatch } from '../types/interfaces';
 import { GcpdTab, SyncStatus, SyncStorageKey } from '../types/enums';
 import { MatchSync } from './match-sync';

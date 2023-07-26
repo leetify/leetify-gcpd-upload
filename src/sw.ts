@@ -1,3 +1,6 @@
+// This is the main Service Worker. It mostly just serves as an entry point,
+// and delegates incoming events.
+
 import { Action } from './action';
 import { AlarmName, EventName } from '../types/enums';
 import { BackgroundSync } from './background-sync';

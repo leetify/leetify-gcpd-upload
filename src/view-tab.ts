@@ -1,3 +1,5 @@
+// This module handles the Service Worker side of the foreground view.
+
 import { tabExists } from './helpers/tab-exists';
 
 class ViewTab {

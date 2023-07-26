@@ -1,3 +1,6 @@
+// This module applies any changes that need to be made because of changed
+// options, e.g. enabling or disabling the background sync every 15 minutes.
+
 import { BackgroundSync } from './background-sync';
 import { isOptionUpdatedEventBody } from '../types/interfaces';
 import { SyncOnPageVisit } from './sync-on-page-visit';

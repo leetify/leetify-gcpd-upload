@@ -1,3 +1,8 @@
+// This module is loaded as part of "the view". It handles SyncStatus events
+// from the Service Worker (emitted during a sync), shows the current status in
+// a (mosty) human-friendly way, and provides a button to manually trigger a
+// sync.
+
 import { EventName, GcpdTab, StatusIcon, SyncStatus } from '../../types/enums';
 import { isRuntimeMessage, isSyncStatusEventBody, SyncStatusEventBody } from '../../types/interfaces';
 

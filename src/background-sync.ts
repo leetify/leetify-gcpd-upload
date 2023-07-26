@@ -1,3 +1,5 @@
+// This module handles the automatic sync on an interval in the background.
+
 import { AlarmName, SyncStorageKey } from '../types/enums';
 import { MatchSync } from './match-sync';
 import { getOptionDefaults } from './constants';
