@@ -40,7 +40,7 @@
 			"all_frames": true,
 
 			"matches": [
-				"https://leetify.com/*"
+				"https://leetify.com/gcpd-extension-auth"
 			],
 
 			"js": [
@@ -53,8 +53,7 @@
 		"alarms",
 		"declarativeNetRequestWithHostAccess",
 		"offscreen",
-		"storage",
-		"webRequest"
+		"storage"
 	],
 
 	"host_permissions": [
