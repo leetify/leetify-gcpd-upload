@@ -7,10 +7,8 @@ import { MatchSync } from './match-sync';
 import { SyncOnPageVisit } from './sync-on-page-visit';
 
 const onStartupOrInstalled = async (): Promise<void> => {
-	// TODO make sure this doesn't cause duplicates
 	await SyncOnPageVisit.applyListener();
 
-	// TODO make sure this doesn't cause duplicates
 	if (await BackgroundSync.shouldRunOnInterval()) {
 		await BackgroundSync.setAlarm();
 	}
