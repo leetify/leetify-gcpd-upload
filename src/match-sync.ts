@@ -38,18 +38,6 @@ class MatchSync {
 		}
 	}
 
-	protected async initDomParser(): Promise<void> {
-		await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZING });
-
-		await chrome.offscreen.createDocument({
-			justification: 'Parse Steam GCPD page',
-			reasons: ['DOM_PARSER'],
-			url: 'src/offscreen/dom-parser.html',
-		});
-
-		await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZED });
-	}
-
 	public async setStatus(eventBody: SyncStatusEventBody): Promise<void> {
 		if (eventBody.status === SyncStatus.DONE) {
 			this.lastStatusEventBody = { status: SyncStatus.IDLE };
@@ -76,6 +64,18 @@ class MatchSync {
 
 	public async handleRequestSyncStatusEvent(): Promise<void> {
 		await chrome.runtime.sendMessage({ event: EventName.SYNC_STATUS, data: this.lastStatusEventBody });
+	}
+
+	protected async initDomParser(): Promise<void> {
+		await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZING });
+
+		await chrome.offscreen.createDocument({
+			justification: 'Parse Steam GCPD page',
+			reasons: ['DOM_PARSER'],
+			url: 'src/offscreen/dom-parser.html',
+		});
+
+		await this.setStatus({ status: SyncStatus.GCPD_PARSER_INITIALIZED });
 	}
 
 	protected async syncAllMatches(leetifyAccessToken: string): Promise<boolean> {

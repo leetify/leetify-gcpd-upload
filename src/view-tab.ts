@@ -19,7 +19,7 @@ class ViewTab {
 		});
 	}
 
-	public async exists(): Promise<boolean> {
+	protected async exists(): Promise<boolean> {
 		if (!this.tab?.id) return false;
 
 		if (!await tabExists(this.tab.id)) {

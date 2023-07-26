@@ -15,7 +15,7 @@ class Gcpd {
 		return this.fetchMatchesRecursively({ tab, previouslyFoundMatchTimestamp, matches: [] });
 	}
 
-	private async fetchMatchesRecursively({
+	protected async fetchMatchesRecursively({
 		continueToken,
 		depth,
 		matches,

@@ -19,7 +19,7 @@ class LeetifyAccessToken {
 		});
 
 		const leetifyAccessToken = await this.leetifyAccessTokenPromise;
-		this.leetifyAccessTokenPromise = null;
+		this.clearPromise();
 		await chrome.offscreen.closeDocument();
 
 		return leetifyAccessToken;
