@@ -4,8 +4,6 @@ import { LEETIFY_FRONTEND_URL } from '../constants';
 (async () => {
 	if (window.location.toString() !== `${LEETIFY_FRONTEND_URL}/gcpd-extension-auth`) return;
 
-	document.write('');
-
 	await chrome.runtime.sendMessage({
 		event: EventName.LEETIFY_ACCESS_TOKEN,
 

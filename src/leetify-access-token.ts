@@ -7,14 +7,10 @@ class LeetifyAccessToken {
 	public async get(): Promise<string | null> {
 		this.leetifyAccessTokenPromise = defer<string | null>();
 
-		chrome.offscreen.createDocument({
+		await chrome.offscreen.createDocument({
 			justification: 'Authenticate with Leetify',
 			reasons: ['IFRAME_SCRIPTING'],
 			url: 'src/offscreen/leetify-auth.html',
-		}).catch((err) => {
-			// TODO this is not great: Chrome never considers the offscreen page to have finished loading for some reason, so we just have it close itself when it's done -- that throws this error, which we don't care about
-			if (err && err.message === 'Offscreen document closed before fully loading.') return;
-			throw err;
 		});
 
 		const leetifyAccessToken = await this.leetifyAccessTokenPromise;
