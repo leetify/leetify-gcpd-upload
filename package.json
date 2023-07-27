@@ -1,7 +1,6 @@
 {
 	"private": true,
 	"name": "leetify-gcpd-upload",
-	"version": "0.0.1",
 	"description": "The Leetify Unranked Uploader automatically imports Unranked Matchmaking, Wingman, and CS2 Limited Test Matches to Leetify.",
 	"scripts": {
 		"build": "npx esbuild src/content-scripts/leetify.ts src/offscreen/dom-parser.ts src/offscreen/leetify-auth.ts src/sw.ts src/view/index.ts --bundle --outdir=dist",
