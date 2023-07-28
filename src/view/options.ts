@@ -60,7 +60,7 @@ export class Options {
 			checkbox.type = 'checkbox';
 			checkbox.checked = !!values[option.key];
 
-			// eslint-disable-next-line no-loop-func
+			// eslint-disable-next-line @typescript-eslint/no-loop-func
 			checkbox.addEventListener('change', async () => {
 				await chrome.storage.sync.set({ [option.key]: checkbox.checked });
 
