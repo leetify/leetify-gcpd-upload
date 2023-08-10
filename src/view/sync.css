@@ -20,6 +20,16 @@ section.sync #status-message {
 	grid-area: 1/3;
 }
 
+section.sync #status-message a {
+	margin-left: 0.25em;
+	color: inherit;
+}
+
+section.sync #status-message a:active,
+section.sync #status-message a:hover {
+	text-decoration: none;
+}
+
 section.sync button {
 	padding: 0.5rem 3.125rem;
 	background: var(--leetify-pink);

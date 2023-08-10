@@ -9,6 +9,9 @@ This project does not adhere to Semantic Versioning.
 ### Added
 * Steam sessions will now be refreshed if required
 
+### Changed
+* Authentication errors now include clickable links to the applicable login page
+
 ### Docs
 * Add readme
 
