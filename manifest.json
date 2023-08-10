@@ -57,6 +57,7 @@
 
 	"host_permissions": [
 		"https://leetify.com/*",
-		"https://steamcommunity.com/my/gcpd/730"
+		"https://steamcommunity.com/my/gcpd/730",
+		"https://login.steampowered.com/jwt/refresh"
 	]
 }

@@ -14,6 +14,8 @@ The extension loads an [offscreen Leetify page in the background](src/offscreen/
 
 Then [it requests the GCPD pages](src/gcpd.ts) for Scrimmage (which includes CS2LT matches) and [extracts matches from the response](src/offscreen/dom-parser.ts), one after another, until it doesn't find any more matches that still have a demo download link. It [sends the demo download links and the timestamps of each match to Leetify](src/leetify-match-uploader.ts) (via the access token from before), which saves all new matches as manual uploads. They'll show up on the [Data Sources](https://leetify.com/app/data-sources) page and will be queued; after a bit of waiting (usually no more than a few minutes), they'll also show up in your [Match History](https://leetify.com/app/matches) on Leetify (but not on the Dashboard or Profile).
 
+If your Steam session has expired and the extension can't actually load the GCPD page, it'll try to refresh your session.
+
 After Scrimmage, the extension will again request GCPD pages for Wingman, filter out ranked or unranked matches ([if configured to do so](src/view/options.ts)), and send the found matches to Leetify.
 
 You can independently enable or disable: the sync every 15 minutes, the sync on Leetify visits, and on GCPD visits.

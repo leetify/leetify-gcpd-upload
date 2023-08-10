@@ -37,7 +37,19 @@ class Gcpd {
 		url.searchParams.set('tab', tab);
 		if (continueToken) url.searchParams.set('continue_token', continueToken);
 
-		const res = await fetch(url);
+		let res = await fetch(url);
+
+		// Steam sessions expire after about a day and need to be refreshed.
+		// We can do that by simply hitting the refresh endpoint, and asking it
+		// to redirect us back to our original target. If this fails, we'll
+		// error out and tell the user to log in to Steam.
+		if (res.url.startsWith('https://steamcommunity.com/login/home')) {
+			const refreshJwtUrl = new URL('https://login.steampowered.com/jwt/refresh');
+			refreshJwtUrl.searchParams.set('redir', url.toString());
+
+			res = await fetch(refreshJwtUrl);
+		}
+
 		if (!/^https:\/\/steamcommunity\.com\/(id\/[^/]+|profiles\/\d+)\/gcpd\/730/.test(res.url)) return GcpdError.STEAM_AUTH_FAILED;
 
 		const json = await res.json();

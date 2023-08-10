@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project does not adhere to Semantic Versioning.
 
 ## [Unreleased]
+### Added
+* Steam sessions will now be refreshed if required
+
 ### Docs
 * Add readme
 
