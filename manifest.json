@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "Leetify Unranked Uploader",
 	"description": "The Leetify Unranked Uploader automatically imports Unranked Matchmaking, Wingman, and CS2 Limited Test Matches to Leetify.",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"homepage_url": "https://leetify.com",
 	"options_page": "src/view/index.html",
 
